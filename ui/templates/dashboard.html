@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" class="dark"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kiwiLAB | Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@10.3.1/dist/gridstack.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/gridstack@10.3.1/dist/gridstack.all.js"></script>
+    
+    <style>
+        :root {
+            --kiwi-red: #D32F2F;
+        }
+        .dark body { background-color: #000000; color: #ffffff; }
+        .light body { background-color: #f3f4f6; color: #111827; }
+        
+        .grid-stack-item-content {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dark .grid-stack-item-content { border-color: #262626; }
+        .light .grid-stack-item-content { background: white; border-color: #e5e7eb; color: black; }
+    </style>
+</head>
+<body class="transition-colors duration-300">
+
+    <nav class="p-4 border-b border-zinc-800 flex justify-between items-center bg-black/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-[var(--kiwi-red)] rounded-lg flex items-center justify-center font-bold text-black">K</div>
+            <span class="text-xl font-black tracking-tighter">kiwi<span class="text-[var(--kiwi-red)]">LAB</span></span>
+        </div>
+        <div class="flex gap-4 items-center">
+            <button onclick="toggleMode()" class="p-2 hover:bg-zinc-800 rounded-full text-xs uppercase font-bold tracking-widest">Modo</button>
+            <div class="h-6 w-[1px] bg-zinc-700"></div>
+            <span class="text-sm opacity-50">Admin</span>
+        </div>
+    </nav>
+
+    <main class="p-6">
+        <div class="grid-stack">
+            <div class="grid-stack-item" gs-w="2" gs-h="2">
+                <div class="grid-stack-item-content flex-col gap-2">
+                    <span class="text-red-600 font-bold text-xs uppercase">Proxmox</span>
+                    <p class="text-[10px] opacity-50">192.168.1.10</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Inicializar Gridstack para el drag & drop
+        var grid = GridStack.init({
+            cellHeight: 100,
+            margin: 10,
+            draggable: { handle: '.grid-stack-item-content' }
+        });
+
+        function toggleMode() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            html.classList.toggle('light');
+        }
+    </script>
+</body>
+</html>

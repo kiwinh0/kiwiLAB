@@ -1,35 +1,50 @@
 package main
 
 import (
-	"fmt"
+	"database/sql"
+	"html/template"
 	"log"
 	"net/http"
+
+	_ "github.com/mattn/go-sqlite3" // Importación necesaria para el driver
 )
 
+var db *sql.DB
+
+func init() {
+	// Inicializamos la base de datos al arrancar
+	var err error
+	db, err = sql.Open("sqlite3", "./kiwilab.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Creamos la tabla si no existe
+	statement, _ := db.Prepare(`CREATE TABLE IF NOT EXISTS bookmarks (
+		id INTEGER PRIMARY KEY AUTOINCREMENT, 
+		title TEXT, 
+		url TEXT, 
+		x INTEGER, 
+		y INTEGER, 
+		w INTEGER, 
+		h INTEGER
+	)`)
+	statement.Exec()
+}
+
 func main() {
-	// Rutas para archivos estáticos
-	fs := http.FileServer(http.Dir("../../ui/static"))
+	fs := http.FileServer(http.Dir("ui/static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	// Ruta principal (Dashboard)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/html")
-		fmt.Fprint(w, `
-			<html>
-			<head>
-				<title>kiwiLAB | Dashboard</title>
-				<script src="https://cdn.tailwindcss.com"></script>
-			</head>
-			<body class="bg-black text-white flex items-center justify-center h-screen">
-				<div class="text-center">
-					<h1 class="text-5xl font-bold text-red-600">kiwiLAB</h1>
-					<p class="mt-4 text-gray-400">Debian 13 x86_64 - Entorno de Desarrollo Listo</p>
-				</div>
-			</body>
-			</html>
-		`)
+		tmpl, err := template.ParseFiles("ui/templates/dashboard.html")
+		if err != nil {
+			http.Error(w, "Error cargando plantilla", 500)
+			return
+		}
+		tmpl.Execute(w, nil)
 	})
 
-	fmt.Println("🚀 kiwiLAB ejecutándose en http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("🚀 kiwiLAB con SQLite activo en http://localhost:8080")
+	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
 }

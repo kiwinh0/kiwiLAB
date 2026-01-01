@@ -31,7 +31,7 @@ Para garantizar el correcto funcionamiento de kiwiLAB de forma nativa:
 Si utilizas una distribución basada en Debian o Ubuntu, puedes realizar la instalación completa (incluyendo dependencias y configuración del servicio de sistema `systemd`) con este comando:
 
 ```bash
-curl -sSL [https://raw.githubusercontent.com/kiwinh0/kiwiLAB/main/install.sh](https://raw.githubusercontent.com/kiwinh0/kiwiLAB/main/install.sh) | sudo bash
+curl -sSL "https://raw.githubusercontent.com/kiwinh0/kiwiLAB/main/install.sh" | sudo bash
 ```
 
 ### 2. Instalación Manual (Compilar)

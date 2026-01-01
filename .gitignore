@@ -1,4 +1,4 @@
-kiwilab
+./kiwilab
 *.db
 .DS_Store
 kiwilab.db-journal

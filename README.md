@@ -21,7 +21,7 @@ Para garantizar el correcto funcionamiento de kiwiLAB de forma nativa:
 * **Sistema Operativo:** Linux (Probado en Debian 12/13 y Ubuntu 22.04+).
 * **Lenguaje:** Go (Golang) 1.21 o superior.
 * **Dependencias de sistema:** `gcc`, `musl-dev` y `sqlite3` (necesarios para la compilación de la base de datos).
-* **Hardware:** Muy ligero (128MB de RAM y 1 vCPU son suficientes).
+* **Hardware:** Muy ligero (64MB de RAM y 1 vCPU son suficientes).
 
 ---
 

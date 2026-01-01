@@ -32,7 +32,7 @@ Si utilizas una distribución basada en Debian o Ubuntu, puedes realizar la inst
 
 ```bash
 curl -sSL [https://raw.githubusercontent.com/kiwinh0/kiwiLAB/main/install.sh](https://raw.githubusercontent.com/kiwinh0/kiwiLAB/main/install.sh) | sudo bash
-
+```
 
 ### 2. Instalación Manual (Compilar)
 

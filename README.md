@@ -36,20 +36,20 @@ curl -sSL [https://raw.githubusercontent.com/kiwinh0/kiwiLAB/main/install.sh](ht
 
 ### 2. Instalación Manual (Compilar)
 
-####  Clonar el repositorio oficial
+ * Clonar el repositorio oficial
 ```bash
 git clone [https://github.com/kiwinh0/kiwiLAB.git](https://github.com/kiwinh0/kiwiLAB.git)
 cd kiwiLAB
 ```
-####  Instalar dependencias de compilación (Debian/Ubuntu)
+ * Instalar dependencias de compilación (Debian/Ubuntu)
 ```bash
 sudo apt update && sudo apt install -y build-essential gcc sqlite3
 ```
-####  Compilar el binario habilitando CGO para el soporte de SQLite
+ * Compilar el binario habilitando CGO para el soporte de SQLite
 ```bash
 CGO_ENABLED=1 go build -o kiwilab ./cmd/kiwilab/main.go
 ```
-####  Ejecutar la aplicación
+ * Ejecutar la aplicación
 ```bash
 ./kiwilab
 ```

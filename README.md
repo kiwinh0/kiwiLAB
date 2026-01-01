@@ -7,7 +7,7 @@
 ---
 
 ##  Características actuales
-* **Interfaz Premium:** Diseño compacto con efectos de desenfoque y tipografía profesional.
+* **Interfaz Ligera:** Diseño compacto con efectos de desenfoque y tipografía profesional.
 * **Modo Oscuro Inteligente:** Soporte nativo para temas claros y oscuros.
 * **Buscador en tiempo real:** Filtra tus servicios instantáneamente mientras escribes.
 * **Gestión de Iconos:** Integración directa con la librería de iconos de `selfhst`.

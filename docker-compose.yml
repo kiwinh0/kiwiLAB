@@ -1,0 +1,9 @@
+services:
+  kiwilab:
+    build: .
+    container_name: kiwilab-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./kiwilab.db:/root/kiwilab.db
+    restart: unless-stopped

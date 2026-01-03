@@ -201,7 +201,7 @@ func (h *Handler) HandleCheckUpdates(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(info)
 }
 
-// HandlePerformUpdate compila e instala la última versión desde el código fuente
+// HandlePerformUpdate descarga e instala el binario pre-compilado desde GitHub
 func (h *Handler) HandlePerformUpdate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -220,7 +220,7 @@ func (h *Handler) HandlePerformUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logrus.Info("Iniciando compilación de actualización...")
+	logrus.Info("Iniciando descarga de actualización...")
 
 	// Obtener ruta actual del ejecutable
 	currentExecutable, err := os.Executable()
@@ -233,13 +233,10 @@ func (h *Handler) HandlePerformUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Crear directorio temporal para compilar
-	tmpDir := "/tmp/codigosh-update"
-	os.RemoveAll(tmpDir)
-	os.MkdirAll(tmpDir, 0755)
-
-	// Script que clona, compila e instala
-	updateScript := "/tmp/update_codigosh_build.sh"
+	// Crear script de actualización que se ejecutará de forma independiente
+	updateScript := "/tmp/update_codigosh.sh"
+	releaseVersion := "v" + updateInfo.AvailableVersion
+	
 	scriptContent := `#!/bin/bash
 set -e
 
@@ -248,84 +245,113 @@ log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> /tmp/codigosh_update.log
 }
 
-log "Iniciando actualización de CodigoSH"
+log "=== Iniciando actualización de CodigoSH a ` + releaseVersion + ` ==="
 
-# Crear directorio y clonar repo
-cd ` + tmpDir + `
-log "Clonando repositorio desde GitHub..."
-git clone --depth=1 --branch main https://github.com/kiwinh0/CodigoSH.git repo
+RELEASE_VERSION="` + releaseVersion + `"
+BINARY_PATH="` + currentExecutable + `"
+TEMP_DIR="/tmp/codigosh-update-$$"
 
-cd repo
-log "Descargando dependencias..."
-export CGO_ENABLED=1
-go mod download
+# Limpiar log anterior
+> /tmp/codigosh_update.log
 
-log "Compilando binario..."
-go build -o codigosH ./cmd/codigosH/main.go
+mkdir -p "$TEMP_DIR"
+cd "$TEMP_DIR"
 
-if [ ! -f codigosH ]; then
-    log "ERROR: Compilación fallida - binario no encontrado"
+# Descargar binario pre-compilado desde GitHub Release
+log "Descargando binario desde GitHub Release $RELEASE_VERSION..."
+DOWNLOAD_URL="https://github.com/kiwinh0/CodigoSH/releases/download/$RELEASE_VERSION/codigosH"
+
+if ! curl -L -f -o codigosH "$DOWNLOAD_URL"; then
+    log "ERROR: No se pudo descargar el binario desde $DOWNLOAD_URL"
+    log "Esto puede indicar que el release no tiene binario adjunto"
     exit 1
 fi
 
-log "Backup del binario actual..."
-cp "` + currentExecutable + `" "` + currentExecutable + `.backup"
+log "Binario descargado correctamente ($(du -h codigosH | cut -f1))"
 
+# Verificar que el binario descargado es válido
+if [ ! -f codigosH ] || [ ! -s codigosH ]; then
+    log "ERROR: El archivo descargado está vacío o no existe"
+    exit 1
+fi
+
+# Hacer ejecutable
+chmod +x codigosH
+log "Permisos de ejecución aplicados"
+
+# Backup del binario actual
+log "Creando backup del binario actual..."
+cp "$BINARY_PATH" "$BINARY_PATH.backup"
+log "Backup creado: $BINARY_PATH.backup"
+
+# Reemplazar binario
 log "Instalando nuevo binario..."
-cp codigosH "` + currentExecutable + `"
-chmod +x "` + currentExecutable + `"
+cp codigosH "$BINARY_PATH"
+chmod +x "$BINARY_PATH"
 
-log "Verificando instalación del binario..."
-if [ ! -f "` + currentExecutable + `" ]; then
-    log "ERROR: El binario no se instaló correctamente"
+# Verificar instalación
+if [ ! -f "$BINARY_PATH" ] || [ ! -x "$BINARY_PATH" ]; then
+    log "ERROR: La instalación falló, restaurando backup..."
+    cp "$BINARY_PATH.backup" "$BINARY_PATH"
     exit 1
 fi
 
+log "Binario instalado correctamente"
+
+# Limpiar
 log "Limpiando archivos temporales..."
 cd /tmp
-rm -rf ` + tmpDir + `
-rm -f ` + updateScript + `
+rm -rf "$TEMP_DIR"
+rm -f /tmp/update_codigosh.sh
 
-log "Actualización completada. Se debe reiniciar el servicio para tomar la nueva versión"
+log "=== Actualización completada exitosamente ==="
+log "Esperando 2 segundos antes de reiniciar el servicio..."
+sleep 2
+
+# Reiniciar servicio
+log "Reiniciando servicio..."
+if systemctl restart codigosH 2>/dev/null; then
+    log "Servicio reiniciado con systemctl"
+elif service codigosH restart 2>/dev/null; then
+    log "Servicio reiniciado con service"
+else
+    log "WARN: No se pudo reiniciar automáticamente. Reiniciar manualmente."
+    # Intentar reiniciar el binario directamente
+    nohup "$BINARY_PATH" > /dev/null 2>&1 &
+    log "Binario reiniciado directamente (PID: $!)"
+fi
+
+log "=== Proceso de actualización finalizado ==="
 `
 
 	if err := os.WriteFile(updateScript, []byte(scriptContent), 0755); err != nil {
 		logrus.WithError(err).Error("Error creando script de actualización")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success": false,
-			"message": "Error en la actualización",
+			"message": "Error preparando actualización",
 		})
 		return
 	}
 
-	// Ejecutar el script y esperar a que termine (compila y reemplaza binario)
+	// Ejecutar el script en segundo plano de forma inmediata
+	// No esperamos a que termine para no bloquear la respuesta
 	cmd := exec.Command("bash", updateScript)
-	if err := cmd.Run(); err != nil {
-		logrus.WithError(err).Error("Error en la actualización")
+	if err := cmd.Start(); err != nil {
+		logrus.WithError(err).Error("Error iniciando script de actualización")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success": false,
-			"message": "Error durante la actualización",
+			"message": "Error iniciando actualización",
 		})
 		return
 	}
 
-	// Lanzar reinicio del servicio en segundo plano para evitar cortar la respuesta
-	go func() {
-		time.Sleep(2 * time.Second)
-		if err := exec.Command("systemctl", "restart", "codigosH").Run(); err != nil {
-			logrus.WithError(err).Warn("No se pudo reiniciar con systemctl, intentando fallback")
-			// Fallback: iniciar binario directamente
-			_ = exec.Command("nohup", currentExecutable).Start()
-		}
-	}()
-
-	logrus.Info("Actualización completada, reinicio programado")
+	logrus.Info("Script de actualización iniciado en segundo plano")
 
 	// Invalidar caché para próxima verificación
 	InvalidateUpdateCache()
 
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
-		"message": "Actualización completada. La página se recargará con la nueva versión.",
+		"message": "Actualización iniciada. El servicio se reiniciará en breve.",
 	})
 }

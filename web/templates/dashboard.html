@@ -1406,22 +1406,22 @@
             const progressHTML = `
                 <div style="display: flex; flex-direction: column; gap: 1.5rem; padding: 1rem 0;">
                     <div style="text-align: center;">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">⚙️</div>
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">⚡</div>
                         <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Actualizando CodigoSH</h3>
-                        <p style="font-size: 0.875rem; opacity: 0.7;">Este proceso puede tardar 30-60 segundos</p>
+                        <p style="font-size: 0.875rem; opacity: 0.7;">Este proceso solo tarda 5-10 segundos</p>
                     </div>
                     
                     <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                         <div class="update-step" id="step-1">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div class="update-spinner"></div>
-                                <span style="font-size: 0.9375rem;">Descargando código fuente...</span>
+                                <span style="font-size: 0.9375rem;">Descargando binario desde GitHub...</span>
                             </div>
                         </div>
                         <div class="update-step" id="step-2" style="opacity: 0.4;">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div class="update-spinner"></div>
-                                <span style="font-size: 0.9375rem;">Compilando aplicación...</span>
+                                <span style="font-size: 0.9375rem;">Instalando nueva versión...</span>
                             </div>
                         </div>
                         <div class="update-step" id="step-3" style="opacity: 0.4;">
@@ -1486,7 +1486,7 @@
                 .then(data => {
                     if (data.success) {
                         // Mostrar todos los pasos como completados inmediatamente
-                        // porque el servidor ya terminó el proceso
+                        // porque el script ya se inició en segundo plano
                         document.getElementById('step-1').classList.add('completed');
                         document.getElementById('step-1').style.opacity = '1';
                         document.getElementById('step-2').style.opacity = '1';
@@ -1495,11 +1495,11 @@
                         document.getElementById('step-3').classList.add('completed');
                         document.getElementById('success-message').style.display = 'block';
                         
-                        // Esperar 4 segundos para que el servicio se reinicie completamente
-                        // (el handler programa el restart con 2s de delay + 2s extra de margen)
+                        // Esperar 6 segundos para que el script descargue, instale y reinicie
+                        // (script toma ~5-10s: descarga 2s + instalación 1s + reinicio 2-3s)
                         setTimeout(() => {
                             window.location.reload();
-                        }, 4000);
+                        }, 6000);
                     } else {
                         throw new Error(data.message || 'Error en la actualización');
                     }

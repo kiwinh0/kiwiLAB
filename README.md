@@ -1,6 +1,6 @@
 # 🚀 CodigoSH
 
-**Versión:** v0.1.0-Beta
+**Versión:** v0.1.1-Beta
 
 **CodigoSH** es un dashboard de marcadores minimalista, rápido y profesional, diseñado para centralizar el acceso a tus servicios autohospedados (Self-hosted) con una estética moderna, limpia y funcional.
 
@@ -60,44 +60,91 @@ CodigoSH/
 
 ## 🛠️ Instalación
 
-### Requisitos
-* Go 1.21+
-* SQLite3
-* GCC (para CGO)
+### Requisitos Mínimos
+* **OS:** Debian 11+, Ubuntu 20.04+ o cualquier distribución Linux con systemd
+* **CPU:** 2 cores mínimo
+* **RAM:** 512MB (1GB recomendado)
+* **Almacenamiento:** 2GB disponible
+* **Red:** Acceso a internet para la instalación
 
-
-
-### Instalación Automática (Debian/Ubuntu)
-Script completo con configuración de systemd:
+### ⚡ Instalación Rápida (Debian/Ubuntu)
 
 ```bash
+# Descargar y ejecutar el script de instalación automática
 curl -sSL "https://raw.githubusercontent.com/kiwinh0/CodigoSH/main/scripts/install.sh" | sudo bash
 ```
 
-### Instalación Manual
+Esto instalará:
+- ✅ Todas las dependencias del sistema
+- ✅ El binario compilado de CodigoSH
+- ✅ Servicio systemd para autoarranque
+- ✅ Base de datos SQLite
+
+Una vez completado, accede a: **http://IP_DEL_SERVIDOR:8080**
+
+**Credenciales por defecto:**
+- Usuario: `admin`
+- Contraseña: `admin`
+
+### 📖 Guía Específica para LXC/Proxmox
+
+Si instalas en un contenedor LXC dentro de Proxmox, consulta nuestra **[guía completa de instalación en LXC](./INSTALL_LXC.md)** que incluye:
+- Configuración del contenedor
+- Solución de problemas de red
+- Comandos para acceso SSH
+- Troubleshooting específico de LXC
+
+### 🔧 Instalación Manual
 
 ```bash
-# Clonar repositorio
+# 1. Clonar repositorio
 git clone https://github.com/kiwinh0/CodigoSH.git
 cd CodigoSH
 
-# Instalar dependencias (Debian/Ubuntu)
-sudo apt update && apt install -y build-essential gcc sqlite3
+# 2. Instalar dependencias (Debian/Ubuntu)
+sudo apt-get update
+sudo apt-get install -y build-essential gcc sqlite3 golang-go git
 
-# Instalar dependencias Go
-make deps
+# 3. Descargar dependencias Go
+go mod download
 
-# Compilar
-make build
+# 4. Compilar
+export CGO_ENABLED=1 GOOS=linux
+go build -o codigosH ./cmd/codigosH/main.go
 
-# Ejecutar
-make run
+# 5. Crear directorio de instalación
+sudo mkdir -p /opt/CodigoSH
+sudo cp codigosH /opt/CodigoSH/
+
+# 6. Crear servicio systemd
+sudo tee /etc/systemd/system/codigosH.service > /dev/null <<'EOF'
+[Unit]
+Description=CodigoSH Dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/CodigoSH
+ExecStart=/opt/CodigoSH/codigosH
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# 7. Habilitar y arrancar
+sudo systemctl daemon-reload
+sudo systemctl enable codigosH
+sudo systemctl start codigosH
 ```
 
-### Docker
+### 🐳 Docker / Docker Compose
 
 ```bash
-# Con docker-compose
+# Con docker-compose (más fácil)
 docker-compose up -d
 
 # O con Docker directo
@@ -105,7 +152,29 @@ docker build -t codigosh .
 docker run -p 8080:8080 -v ./codigosH.db:/root/codigosH.db codigosh
 ```
 
-La aplicación estará disponible en `http://localhost:8080`
+### 🔍 Diagnosticar Problemas
+
+Si la instalación falla, ejecuta nuestro script de diagnóstico:
+
+```bash
+# Descargar y ejecutar
+curl -sSL "https://raw.githubusercontent.com/kiwinh0/CodigoSH/main/scripts/diagnostico.sh" | sudo bash
+```
+
+Este script verificará:
+- Sistema operativo compatible
+- Conectividad a internet
+- Dependencias instaladas
+- Puertos disponibles
+- Estado del servicio CodigoSH
+- Logs de errores
+
+**Acceso a la aplicación:**
+```
+🌐 URL: http://IP_DEL_SERVIDOR:8080
+👤 Usuario: admin
+🔐 Contraseña: admin
+```
 
 ---
 

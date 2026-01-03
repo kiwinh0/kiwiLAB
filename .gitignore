@@ -2,6 +2,7 @@
 bin/
 codigosH
 kiwilab
+main
 
 # Bases de datos
 *.db
@@ -12,10 +13,15 @@ kiwilab
 # Logs
 *.log
 
-# Archivos temporales
+# Archivos temporales y de prueba
 *.tmp
 *.swp
 .DS_Store
+cookies.txt
+test_*.go
+test_*.html
+test_*.sh
+simple_test.sh
 
 # Uploads
 web/static/uploads/*
@@ -25,3 +31,21 @@ web/static/uploads/*
 .vscode/
 .idea/
 *.iml
+
+# Documentación temporal
+LXC-PROXMOX-HELP.md
+
+# Archivos de desarrollo/testing
+*.py
+complete_*.sh
+test_*.sh
+install.sh
+create_release.sh
+*_TRADUCCION.md
+ESTADO_FINAL_TRADUCCION.txt
+TRANSLATION_SYSTEM_COMPLETE.md
+final_verification.md
+DEMO_TRADUCCION.md
+INSTRUCCIONES_DE_USO.sh
+README_TRADUCCION.md
+ui/

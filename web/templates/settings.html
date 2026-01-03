@@ -1295,7 +1295,7 @@
                         const lang = this.dataset.lang;
                         const text = this.dataset.text;
                         
-                        console.log('[Settings] Idioma seleccionado:', lang, text);
+                        console.log('[Settings] Idioma seleccionado (preview):', lang, text);
                         
                         selectedLangText.textContent = text;
                         languageInput.value = lang;
@@ -1308,24 +1308,16 @@
                         languageDropdownMenu.classList.remove('open');
                         languageSelected.classList.remove('open');
                         
-                        // Load and persist the selected language immediately for preview
+                        // Load and show preview of the selected language
                         if (window.i18n) {
-                            console.log('[Settings] Cargando idioma seleccionado:', lang);
+                            console.log('[Settings] Mostrando preview del idioma:', lang);
                             window.i18n.loadLanguage(lang).then(() => {
-                                console.log('[Settings] Idioma cargado, actualizando página');
+                                console.log('[Settings] Preview cargado, actualizando página');
                                 window.i18n.updatePageLanguage();
                                 translateSettingsPage();
-                                window.i18n.persistLanguage(lang);
-                                
-                                // Automatically submit the form to save to database
-                                // Find the parent form and submit it
-                                const form = languageInput.closest('form');
-                                if (form) {
-                                    console.log('[Settings] Enviando formulario para guardar en BD');
-                                    form.submit();
-                                } else {
-                                    console.error('[Settings] No se encontró el formulario padre');
-                                }
+                                // NO persistir aquí - solo preview
+                                // El usuario debe hacer clic en "Guardar preferencias"
+                                console.log('[Settings] Preview listo. Haz clic en "Guardar preferencias" para confirmar');
                             });
                         }
                     });

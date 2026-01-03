@@ -27,20 +27,35 @@ var (
 	updateCache     *UpdateInfo
 	updateCacheMu   sync.RWMutex
 	lastCheckTime   time.Time
-	cacheExpiration = 24 * time.Hour
+	cacheExpiration = 1 * time.Hour
 )
+
+// InvalidateUpdateCache fuerza la próxima verificación a ir contra GitHub
+func InvalidateUpdateCache() {
+	updateCacheMu.Lock()
+	defer updateCacheMu.Unlock()
+	updateCache = nil
+	lastCheckTime = time.Time{}
+}
 
 // CheckForUpdates verifica si hay una nueva versión en GitHub
 func CheckForUpdates() *UpdateInfo {
 	updateCacheMu.RLock()
 	if updateCache != nil && time.Since(lastCheckTime) < cacheExpiration {
-		defer updateCacheMu.RUnlock()
-		return updateCache
+		info := updateCache
+		updateCacheMu.RUnlock()
+		logrus.WithFields(logrus.Fields{
+			"source":            "cache",
+			"current_version":   Version,
+			"available_version": info.AvailableVersion,
+			"update_available":  info.UpdateAvailable,
+		}).Debug("Update check served from cache")
+		return info
 	}
 	updateCacheMu.RUnlock()
 
-	// Obtener información de la última versión desde GitHub
-	resp, err := http.Get("https://api.github.com/repos/kiwinh0/CodigoSH/releases/latest")
+	// Obtener la última release (incluye prereleases, excluye drafts) para no saltar betas
+	resp, err := http.Get("https://api.github.com/repos/kiwinh0/CodigoSH/releases?per_page=1")
 	if err != nil {
 		logrus.WithError(err).Warn("Could not check for updates")
 		return &UpdateInfo{UpdateAvailable: false}
@@ -57,22 +72,37 @@ func CheckForUpdates() *UpdateInfo {
 		return &UpdateInfo{UpdateAvailable: false}
 	}
 
-	var release struct {
+	var releases []struct {
 		TagName string `json:"tag_name"`
 		Body    string `json:"body"`
 		Date    string `json:"published_at"`
 	}
 
-	if err := json.Unmarshal(body, &release); err != nil {
+	if err := json.Unmarshal(body, &releases); err != nil {
 		logrus.WithError(err).Warn("Could not parse GitHub response")
 		return &UpdateInfo{UpdateAvailable: false}
 	}
+
+	if len(releases) == 0 {
+		logrus.Warn("No releases found in GitHub response")
+		return &UpdateInfo{UpdateAvailable: false}
+	}
+
+	release := releases[0]
 
 	// Extraer versión del tag (ej: v0.2.0 -> 0.2.0)
 	latestVersion := strings.TrimPrefix(release.TagName, "v")
 
 	// Comparar versiones
-	updateAvailable := compareVersions(Version, latestVersion) < 0
+	cmpResult := compareVersions(Version, latestVersion)
+	updateAvailable := cmpResult < 0
+	logrus.WithFields(logrus.Fields{
+		"source":           "github",
+		"current_version":  Version,
+		"latest_version":   latestVersion,
+		"compare_result":   cmpResult,
+		"update_available": updateAvailable,
+	}).Info("Update check evaluated")
 
 	// Parsear cambios desde el body
 	changes := parseChanges(release.Body)
@@ -160,6 +190,11 @@ func parseChanges(body string) []string {
 
 // HandleCheckUpdates es el handler para verificar actualizaciones desde el frontend
 func (h *Handler) HandleCheckUpdates(w http.ResponseWriter, r *http.Request) {
+	// Permitir forzar invalidación de caché con ?force=true
+	if r.URL.Query().Get("force") == "true" {
+		InvalidateUpdateCache()
+	}
+
 	info := CheckForUpdates()
 
 	w.Header().Set("Content-Type", "application/json")

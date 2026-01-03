@@ -1,39 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{.User.Language}}" class="dark">
 <head>
-    <script>
-        // Traduce elementos clave con data-i18n
-        function translateAboutPage() {
-            const setText = (selector, key, fallback) => {
-                const el = document.querySelector(selector);
-                if (!el) return;
-                const translated = i18n.translate(key) || fallback;
-                el.textContent = translated;
-            };
-
-            // Versión dinámica
-            const versionEl = document.querySelector('.version');
-            if (versionEl) {
-                const versionNumber = versionEl.getAttribute('data-version');
-                const versionLabel = i18n.translate('about.version') || 'Versión';
-                versionEl.textContent = `${versionLabel} ${versionNumber}`;
-            }
-
-            setText('.description', 'about.description', document.querySelector('.description')?.textContent.trim());
-            setText('.developed', 'about.developed_with', 'Desarrollado con ❤️ usando Go y modern web technologies');
-            setText('.copyright', 'about.copyright', '© 2026 CodigoSH. Todos los derechos reservados.');
-            setText('.license-note', 'about.license_note', 'Libre de usar, modificar y distribuir.');
-
-            const githubLink = document.querySelector('.github-link');
-            if (githubLink) {
-                const icon = githubLink.querySelector('svg');
-                const translated = i18n.translate('about.view_on_github') || githubLink.textContent.trim();
-                githubLink.innerHTML = '';
-                if (icon) githubLink.appendChild(icon);
-                githubLink.appendChild(document.createTextNode(' ' + translated));
-            }
-        }
-
+    <style>
         /* Gradientes de fondo */
         .gradient-bg {
             position: fixed;

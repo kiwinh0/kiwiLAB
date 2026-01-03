@@ -172,7 +172,8 @@
     "desarrollado_con": "Go 및 최신 웹 기술을 사용한 ❤️로 개발",
     "derechos_reservados": "© 2026 CodigoSH. 모든 권리 보유.",
     "developed_with": "❤️ 로 Go 및 최신 웹 기술을 사용하여 개발됨",
-    "view_on_github": "GitHub에서 보기"
+    "view_on_github": "GitHub에서 보기",
+    "license_note": "자유롭게 사용, 수정, 배포 가능합니다."
   },
   "languages": {
     "en": "English",

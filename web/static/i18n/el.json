@@ -172,7 +172,8 @@
     "desarrollado_con": "Ανάπτυξη με ❤️ χρησιμοποιώντας Go και σύγχρονες τεχνολογίες web",
     "derechos_reservados": "© 2026 CodigoSH. Με επιφύλαξη παντός δικαιώματος.",
     "developed_with": "Αναπτύχθηκε με ❤️ χρησιμοποιώντας Go και σύγχρονες τεχνολογίες ιστού",
-    "view_on_github": "Προβολή στο GitHub"
+    "view_on_github": "Προβολή στο GitHub",
+    "license_note": "Ελεύθερο για χρήση, τροποποίηση και διανομή."
   },
   "languages": {
     "en": "English",

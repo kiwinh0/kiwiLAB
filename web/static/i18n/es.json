@@ -184,7 +184,8 @@
     "desarrollado_con": "Desarrollado con ❤️ usando Go y modern web technologies",
     "derechos_reservados": "© 2026 CodigoSH. Todos los derechos reservados.",
     "developed_with": "Desarrollado con ❤️ usando Go y modern web technologies",
-    "view_on_github": "Ver en GitHub"
+    "view_on_github": "Ver en GitHub",
+    "license_note": "Libre de usar, modificar y distribuir."
   },
   "languages": {
     "en": "English",

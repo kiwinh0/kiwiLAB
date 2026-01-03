@@ -172,7 +172,8 @@
     "desarrollado_con": "Phát triển với ❤️ sử dụng Go và các công nghệ web hiện đại",
     "derechos_reservados": "© 2026 CodigoSH. Đã đăng ký Bản quyền.",
     "developed_with": "Được phát triển với ❤️ bằng Go và công nghệ web hiện đại",
-    "view_on_github": "Xem trên GitHub"
+    "view_on_github": "Xem trên GitHub",
+    "license_note": "Tự do sử dụng, sửa đổi và phân phối."
   },
   "languages": {
     "en": "English",

@@ -213,11 +213,152 @@
             margin-top: -1rem;
             margin-bottom: 1.5rem;
             animation: blink 1s infinite ease-in-out;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .update-available:hover {
+            background: rgba(34, 197, 94, 0.1);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
         }
 
         @keyframes blink {
             0% { opacity: 0.4; }
             100% { opacity: 1; }
+        }
+
+        /* Modal de actualización */
+        .update-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .update-modal.active {
+            display: flex;
+        }
+
+        .update-modal-content {
+            background: rgba(15, 15, 17, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        html:not(.dark) .update-modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .update-modal-header {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #22c55e;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .update-modal-body {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        html:not(.dark) .update-modal-body {
+            color: #475569;
+        }
+
+        .update-modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn-update {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-update-primary {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.35);
+        }
+
+        .btn-update-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 35px rgba(239, 68, 68, 0.45);
+        }
+
+        .btn-update-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-update-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-update-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .update-progress {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .update-progress.show {
+            display: block;
+        }
+
+        .progress-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(34, 197, 94, 0.2);
+            border-top-color: #22c55e;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        .progress-text {
+            display: inline-block;
+            color: #22c55e;
+            font-weight: 600;
         }
 
         /* Logo */
@@ -493,6 +634,27 @@
         </div>
     </div>
 
+    <!-- Modal de actualización -->
+    <div class="update-modal" id="updateModal">
+        <div class="update-modal-content">
+            <div class="update-modal-header">
+                🚀 Actualización Disponible
+            </div>
+            <div class="update-modal-body">
+                <p id="updateMessage">Una nueva versión está disponible. ¿Deseas actualizar ahora?</p>
+                <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 1rem;">El servicio se reiniciará automáticamente después de la actualización.</p>
+            </div>
+            <div class="update-progress" id="updateProgress">
+                <div class="progress-spinner"></div>
+                <span class="progress-text">Actualizando...</span>
+            </div>
+            <div class="update-modal-actions" id="updateActions">
+                <button class="btn-update btn-update-primary" id="confirmUpdateBtn">Actualizar</button>
+                <button class="btn-update btn-update-secondary" id="cancelUpdateBtn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Función para traducir elementos con data-i18n
         function translateAboutPage() {
@@ -545,6 +707,7 @@
                     const avail = data.available_version || 'nueva versión';
                     banner.style.display = 'block';
                     banner.textContent = `Nueva versión ${avail} disponible`;
+                    banner.dataset.version = avail;
                 } else {
                     banner.style.display = 'none';
                     banner.textContent = '';
@@ -559,6 +722,51 @@
                 if (icon) {
                     icon.classList.remove('spin');
                 }
+            }
+        }
+
+        function openUpdateModal() {
+            document.getElementById('updateModal').classList.add('active');
+        }
+
+        function closeUpdateModal() {
+            document.getElementById('updateModal').classList.remove('active');
+        }
+
+        async function performUpdate() {
+            const modal = document.getElementById('updateModal');
+            const actions = document.getElementById('updateActions');
+            const progress = document.getElementById('updateProgress');
+            const confirmBtn = document.getElementById('confirmUpdateBtn');
+
+            confirmBtn.disabled = true;
+            actions.style.display = 'none';
+            progress.classList.add('show');
+
+            try {
+                const res = await fetch('/perform-update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    progress.innerHTML = '<div class="progress-spinner" style="border-top-color: #22c55e;"></div><span class="progress-text" style="color: #22c55e;">Actualización en progreso...</span>';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    progress.classList.remove('show');
+                    actions.style.display = 'flex';
+                    confirmBtn.disabled = false;
+                    alert('Error en la actualización: ' + (data.message || 'error desconocido'));
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                progress.classList.remove('show');
+                actions.style.display = 'flex';
+                confirmBtn.disabled = false;
+                alert('Error: ' + err.message);
             }
         }
 
@@ -577,9 +785,35 @@
                 localStorage.setItem('currentLanguage', userLanguage);
             });
 
+            // Event listeners para actualización
             const updateBtn = document.getElementById('forceUpdateCheck');
             if (updateBtn) {
                 updateBtn.addEventListener('click', () => checkUpdates(true));
+            }
+
+            const banner = document.getElementById('updateAvailableBanner');
+            if (banner) {
+                banner.addEventListener('click', openUpdateModal);
+            }
+
+            const cancelBtn = document.getElementById('cancelUpdateBtn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', closeUpdateModal);
+            }
+
+            const confirmBtn = document.getElementById('confirmUpdateBtn');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', performUpdate);
+            }
+
+            // Cerrar modal al hacer click fuera
+            const modal = document.getElementById('updateModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeUpdateModal();
+                    }
+                });
             }
         });
     </script>

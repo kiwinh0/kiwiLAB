@@ -1208,6 +1208,10 @@
 
         // Load saved theme and language defaults
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('[Settings] DOMContentLoaded iniciado');
+            console.log('[Settings] HTML lang attribute:', document.documentElement.getAttribute('lang'));
+            console.log('[Settings] localStorage.language:', localStorage.getItem('language'));
+            
             // Detectar si se actualizó el idioma desde el backend
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('lang_updated') === 'true') {
@@ -1222,15 +1226,19 @@
             
             // Load user's language from backend
             const userLanguage = '{{.User.Language}}' || 'es';
+            console.log('[Settings] userLanguage desde backend:', userLanguage);
             
             // Set i18n language and load translations
             if (window.i18n) {
+                console.log('[Settings] Cargando idioma:', userLanguage);
                 window.i18n.loadLanguage(userLanguage).then(() => {
+                    console.log('[Settings] Idioma cargado exitosamente');
                     window.i18n.updatePageLanguage();
                     // Translate settings page content
                     translateSettingsPage();
                     // Persist to localStorage so it's remembered for other pages
                     window.i18n.persistLanguage(userLanguage);
+                    console.log('[Settings] Idioma persistido en localStorage');
                     
                     // Show alerts after translations are loaded
                     checkAndShowAlerts();
@@ -1287,8 +1295,12 @@
                         const lang = this.dataset.lang;
                         const text = this.dataset.text;
                         
+                        console.log('[Settings] Idioma seleccionado:', lang, text);
+                        
                         selectedLangText.textContent = text;
                         languageInput.value = lang;
+                        
+                        console.log('[Settings] languageInput.value establecido a:', languageInput.value);
                         
                         document.querySelectorAll('.language-option').forEach(opt => opt.classList.remove('selected'));
                         this.classList.add('selected');
@@ -1298,7 +1310,9 @@
                         
                         // Load and persist the selected language immediately for preview
                         if (window.i18n) {
+                            console.log('[Settings] Cargando idioma seleccionado:', lang);
                             window.i18n.loadLanguage(lang).then(() => {
+                                console.log('[Settings] Idioma cargado, actualizando página');
                                 window.i18n.updatePageLanguage();
                                 translateSettingsPage();
                                 window.i18n.persistLanguage(lang);
@@ -1307,8 +1321,10 @@
                                 // Find the parent form and submit it
                                 const form = languageInput.closest('form');
                                 if (form) {
-                                    console.log('[Settings] Auto-guardando idioma en BD:', lang);
+                                    console.log('[Settings] Enviando formulario para guardar en BD');
                                     form.submit();
+                                } else {
+                                    console.error('[Settings] No se encontró el formulario padre');
                                 }
                             });
                         }

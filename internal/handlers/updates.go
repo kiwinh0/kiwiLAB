@@ -358,7 +358,7 @@ rm -f /tmp/update_codigosh.sh
 	// Ejecutar el script usando bash directamente con nohup
 	// &  al final lo pone en background, pero queremos que persista después del cierre del servidor
 	cmd := exec.Command("bash", "-c", fmt.Sprintf("nohup bash %s > /dev/null 2>&1 &", updateScript))
-	
+
 	if err := cmd.Run(); err != nil {
 		logrus.WithError(err).Error("Error iniciando script de actualización")
 		json.NewEncoder(w).Encode(map[string]interface{}{

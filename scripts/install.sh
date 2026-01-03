@@ -12,7 +12,7 @@ log_success() { echo -e "${GREEN}✅ $1${NC}"; }
 log_info() { echo -e "${BLUE}ℹ️  $1${NC}"; }
 
 echo -e "${GREEN}════════════════════════════════════════════════════════════${NC}"
-echo -e "${GREEN}🚀 CodigoSH v0.1.0-Beta Installation Script${NC}"
+echo -e "${GREEN}🚀 CodigoSH Installation Script${NC}"
 echo -e "${GREEN}════════════════════════════════════════════════════════════${NC}\n"
 
 [ "$EUID" -eq 0 ] || { log_error "Ejecuta con: sudo bash $0"; exit 1; }
@@ -79,10 +79,6 @@ if systemctl start codigosH 2>/dev/null; then
     echo ""
     echo -e "${GREEN}════════════════════════════════════════════════════════════${NC}"
     echo -e "📍 Acceso: ${YELLOW}http://$IP:8080${NC}"
-    echo -e "👤 Usuario: ${YELLOW}admin${NC} | 🔐 Contraseña: ${YELLOW}admin${NC}"
-    echo -e "📊 Logs: ${YELLOW}sudo journalctl -u codigosH -f${NC}"
-    echo -e "🛑 Detener: ${YELLOW}sudo systemctl stop codigosH${NC}"
-    echo -e "🔄 Reiniciar: ${YELLOW}sudo systemctl restart codigosH${NC}"
     echo -e "${GREEN}════════════════════════════════════════════════════════════${NC}"
     exit 0
   else

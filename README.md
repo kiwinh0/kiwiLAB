@@ -1,7 +1,5 @@
 # 🚀 CodigoSH
 
-**Versión:** v0.1.1-Beta
-
 **CodigoSH** es un dashboard de marcadores minimalista, rápido y profesional, diseñado para centralizar el acceso a tus servicios autohospedados (Self-hosted) con una estética moderna, limpia y funcional.
 
 ---

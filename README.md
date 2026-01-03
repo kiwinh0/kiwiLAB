@@ -56,15 +56,32 @@ El asistente de instalación te guiará para crear tu usuario y configurar la ap
 
 ---
 
-## ⚙️ Configuración
+## 🔄 Actualizaciones Automáticas
 
-Edita `~/.codigosh/config.yaml` si necesitas cambios avanzados:
+CodigoSH incluye un sistema de actualizaciones automáticas que:
 
-```yaml
-server:
-  host: "0.0.0.0"
-  port: "8080"
-```
+1. **Detecta Nuevas Versiones:** Verifica GitHub automáticamente cada 24 horas
+2. **Notifica al Usuario:** Muestra badge y menú cuando hay actualización disponible
+3. **Compila desde Fuente:** Descarga el código fuente y compila localmente en tu servidor
+4. **Reemplaza Binario:** Actualiza automáticamente el ejecutable con backup
+5. **Reinicia Servicio:** Reinicia automáticamente el servicio systemd
+
+### Cómo Actualizar
+
+* Click en el icono del usuario → "Actualización disponible"
+* Click en el botón "Actualizar"
+* Espera a que compile (30-60 segundos)
+* El servicio se reiniciará automáticamente
+
+### Requisitos para Actualizaciones
+
+Las actualizaciones requieren que tu servidor tenga:
+- **Git:** Instalado (incluido en install.sh)
+- **Go 1.24+:** Instalado (incluido en install.sh)
+- **Build Tools:** gcc, make (incluido en install.sh)
+
+---
+
 
 ---
 

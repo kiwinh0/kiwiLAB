@@ -102,8 +102,7 @@
     "newVersion": "Neue Version:",
     "releaseDate": "Veröffentlichungsdatum:",
     "mainChanges": "Hauptänderungen:",
-    "viewReleaseNotes": "Versionshinweise ansehen",
-    "later": "Später"
+    "viewReleaseNotes": "Versionshinweise ansehen",    "updateNow": "Jetzt aktualisieren",    "later": "Später"
   },
   "settings": {
     "title": "Einstellungen",

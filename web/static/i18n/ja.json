@@ -102,8 +102,7 @@
     "newVersion": "新しいバージョン：",
     "releaseDate": "リリース日：",
     "mainChanges": "主な変更：",
-    "viewReleaseNotes": "リリースノートを表示",
-    "later": "後で"
+    "viewReleaseNotes": "リリースノートを表示",    "updateNow": "今すぐ更新",    "later": "後で"
   },
   "settings": {
     "title": "設定",

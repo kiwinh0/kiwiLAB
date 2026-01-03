@@ -102,8 +102,7 @@
     "newVersion": "إصدار جديد:",
     "releaseDate": "تاريخ الإصدار:",
     "mainChanges": "التغييرات الرئيسية:",
-    "viewReleaseNotes": "عرض ملاحظات الإصدار",
-    "later": "لاحقا"
+    "viewReleaseNotes": "عرض ملاحظات الإصدار",    "updateNow": "التحديث الآن",    "later": "لاحقا"
   },
   "settings": {
     "title": "الإعدادات",

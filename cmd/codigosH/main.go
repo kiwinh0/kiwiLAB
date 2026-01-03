@@ -17,7 +17,7 @@ func main() {
 		}
 	}()
 
-	logrus.Info("🚀 Iniciando CodigoSH v0.1.0-Beta...")
+	logrus.Info("🚀 Iniciando CodigoSH v0.1.6-Beta...")
 
 	// Cargar configuración
 	cfg, err := config.LoadConfig()

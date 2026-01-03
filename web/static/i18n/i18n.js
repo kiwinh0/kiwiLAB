@@ -2,11 +2,11 @@
 class I18n {
     constructor() {
         this.translations = {};
-        this.currentLanguage = this.getStoredLanguage() || 'en';
         this.supportedLanguages = [
             'en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'zh', 'ja', 'ko',
             'ar', 'hi', 'nl', 'sv', 'pl', 'tr', 'vi', 'th', 'id', 'el'
         ];
+        this.currentLanguage = this.getStoredLanguage() || 'en';
     }
 
     getStoredLanguage() {

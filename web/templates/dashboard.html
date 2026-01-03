@@ -1573,6 +1573,16 @@
             
             // Verificar actualizaciones
             checkUpdatesOnLoad();
+            
+            // Si viene desde about.html con showUpdate=true, abrir modal de actualización
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('showUpdate') === 'true') {
+                setTimeout(() => {
+                    openUpdateModal();
+                    // Limpiar el parámetro de la URL
+                    window.history.replaceState({}, document.title, '/dashboard');
+                }, 500);
+            }
         });
     </script>
 </body>

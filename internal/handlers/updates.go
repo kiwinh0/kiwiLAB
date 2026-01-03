@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -92,17 +93,42 @@ func CheckForUpdates() *UpdateInfo {
 	return info
 }
 
-// compareVersions compara dos versiones (1.0.0 vs 0.9.0)
+// compareVersions compara dos versiones semánticas (1.0.0 vs 0.9.0)
 // Retorna: -1 si v1 < v2, 0 si son iguales, 1 si v1 > v2
 func compareVersions(v1, v2 string) int {
-	// Simplificar: solo comparación de strings lexicográfica para esta beta
-	if v1 == v2 {
-		return 0
+	// Limpiar sufijos (ej: -Beta, -alpha, etc)
+	v1Clean := strings.Split(v1, "-")[0]
+	v2Clean := strings.Split(v2, "-")[0]
+
+	// Dividir en partes numéricas
+	v1Parts := strings.Split(v1Clean, ".")
+	v2Parts := strings.Split(v2Clean, ".")
+
+	// Comparar cada parte
+	maxLen := len(v1Parts)
+	if len(v2Parts) > maxLen {
+		maxLen = len(v2Parts)
 	}
-	if v1 < v2 {
-		return -1
+
+	for i := 0; i < maxLen; i++ {
+		var num1, num2 int
+
+		if i < len(v1Parts) {
+			num1, _ = strconv.Atoi(v1Parts[i])
+		}
+		if i < len(v2Parts) {
+			num2, _ = strconv.Atoi(v2Parts[i])
+		}
+
+		if num1 < num2 {
+			return -1
+		}
+		if num1 > num2 {
+			return 1
+		}
 	}
-	return 1
+
+	return 0
 }
 
 // parseChanges extrae los cambios principales del body del release

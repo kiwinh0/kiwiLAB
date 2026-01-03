@@ -10,18 +10,25 @@ class I18n {
     }
 
     getStoredLanguage() {
-        // First check for explicit user selection in localStorage
+        // PRIORIDAD 1: HTML lang attribute (viene de la base de datos)
+        const htmlLang = document.documentElement.getAttribute('lang');
+        if (htmlLang && this.supportedLanguages.includes(htmlLang)) {
+            // Sincronizar localStorage con la fuente de verdad (BD)
+            const storedLang = localStorage.getItem('language');
+            if (storedLang !== htmlLang) {
+                console.log(`[i18n] Sincronizando localStorage: ${storedLang} → ${htmlLang}`);
+                this.persistLanguage(htmlLang);
+            }
+            return htmlLang;
+        }
+        
+        // PRIORIDAD 2: localStorage (solo si no hay HTML lang)
         const hasUserSelection = localStorage.getItem('languageSelected') === 'true';
         if (hasUserSelection) {
             return localStorage.getItem('language') || localStorage.getItem('selectedLanguage') || 'en';
         }
         
-        // Otherwise use the HTML lang attribute if available (comes from backend)
-        const htmlLang = document.documentElement.getAttribute('lang');
-        if (htmlLang && this.supportedLanguages.includes(htmlLang)) {
-            return htmlLang;
-        }
-        
+        // PRIORIDAD 3: Fallback a inglés
         return 'en';
     }
 

@@ -1208,6 +1208,18 @@
 
         // Load saved theme and language defaults
         document.addEventListener('DOMContentLoaded', function() {
+            // Detectar si se actualizó el idioma desde el backend
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('lang_updated') === 'true') {
+                const htmlLang = document.documentElement.getAttribute('lang');
+                if (window.i18n && htmlLang) {
+                    console.log('[Settings] Idioma actualizado detectado, sincronizando:', htmlLang);
+                    window.i18n.persistLanguage(htmlLang);
+                    // Limpiar URL sin recargar
+                    window.history.replaceState({}, '', window.location.pathname + '?success=profile_updated');
+                }
+            }
+            
             // Load user's language from backend
             const userLanguage = '{{.User.Language}}' || 'es';
             

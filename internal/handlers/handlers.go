@@ -718,7 +718,18 @@ func (h *Handler) HandleUpdateProfile(w http.ResponseWriter, r *http.Request) {
 		"language":      newLanguage,
 	}).Info("UPDATE executed successfully")
 
-	http.Redirect(w, r, "/settings?success=profile_updated", http.StatusSeeOther)
+	// Set language cookie for i18n synchronization
+	languageCookieExpiration := time.Now().Add(365 * 24 * time.Hour) // 1 year
+	http.SetCookie(w, &http.Cookie{
+		Name:     "currentLanguage",
+		Value:    newLanguage,
+		Expires:  languageCookieExpiration,
+		Path:     "/",
+		HttpOnly: false, // Need to be readable by JavaScript
+		SameSite: http.SameSiteLaxMode,
+	})
+
+	http.Redirect(w, r, "/settings?success=profile_updated&lang_updated=true", http.StatusSeeOther)
 }
 func (h *Handler) HandleAbout(w http.ResponseWriter, r *http.Request) {
 	logrus.Info("About page requested")
@@ -980,6 +991,17 @@ func (h *Handler) HandleSetupSubmit(w http.ResponseWriter, r *http.Request) {
 		Expires:  expirationTime,
 		Path:     "/",
 		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
+
+	// Set language cookie for i18n
+	languageCookieExpiration := time.Now().Add(365 * 24 * time.Hour) // 1 year
+	http.SetCookie(w, &http.Cookie{
+		Name:     "currentLanguage",
+		Value:    language,
+		Expires:  languageCookieExpiration,
+		Path:     "/",
+		HttpOnly: false, // Need to be readable by JavaScript
 		SameSite: http.SameSiteLaxMode,
 	})
 

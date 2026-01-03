@@ -1014,6 +1014,19 @@
         // Llamar cuando se abre el modal
         document.addEventListener('DOMContentLoaded', function() {
             populateUpdateModal();
+            
+            // Sincronizar idioma desde el backend (DB) al frontend (localStorage)
+            // Esto asegura que después del setup o cambio en settings, el idioma se persiste correctamente
+            if (window.i18n) {
+                const htmlLang = document.documentElement.getAttribute('lang');
+                const storedLang = localStorage.getItem('language');
+                
+                // Si el idioma del HTML (viene del backend/DB) no coincide con localStorage, sincronizar
+                if (htmlLang && storedLang !== htmlLang) {
+                    console.log('[Dashboard] Sincronizando idioma:', storedLang, '→', htmlLang);
+                    window.i18n.persistLanguage(htmlLang);
+                }
+            }
         });
     </script>
 

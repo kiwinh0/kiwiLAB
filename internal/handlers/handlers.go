@@ -18,7 +18,7 @@ import (
 )
 
 // Version de CodigoSH
-const Version = "0.1.2-Beta"
+const Version = "0.1.3-Beta"
 
 func min(a, b int) int {
 	if a < b {

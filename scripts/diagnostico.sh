@@ -10,7 +10,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║      CodigoSH v0.1.8-Beta - Script de Diagnóstico       ║${NC}"
+echo -e "${BLUE}║      CodigoSH v0.1.9-Beta - Script de Diagnóstico       ║${NC}"
 echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}\n"
 
 check_status() {

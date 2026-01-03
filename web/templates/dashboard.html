@@ -1388,14 +1388,17 @@
             
             updateBtn.disabled = true;
             updateBtn.style.opacity = '0.6';
-            updateBtn.querySelector('span').textContent = 'Actualizando...';
+            updateBtn.querySelector('span').textContent = 'Compilando...';
             
             fetch('/perform-update', { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        updateBtn.querySelector('span').textContent = '✓ Actualizado correctamente';
+                        updateBtn.querySelector('span').textContent = '✓ Actualización iniciada';
+                        // Esperar más tiempo porque la compilación toma más que una descarga
                         setTimeout(() => {
+                            // Mostrar mensaje de espera
+                            alert('El servicio se está reiniciando con la nueva versión.\nEsto puede tomar 30-60 segundos. Por favor, espera...');
                             window.location.reload();
                         }, 2000);
                     } else {

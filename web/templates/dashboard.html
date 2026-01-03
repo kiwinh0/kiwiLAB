@@ -1397,23 +1397,117 @@
 
         function performUpdate() {
             const updateBtn = document.getElementById('update-btn');
-            const originalText = updateBtn.querySelector('span').textContent;
+            const updateContent = document.getElementById('update-content');
             
-            updateBtn.disabled = true;
-            updateBtn.style.opacity = '0.6';
-            updateBtn.querySelector('span').textContent = 'Compilando...';
+            // Ocultar contenido original del modal
+            updateContent.style.display = 'none';
             
+            // Crear interfaz de progreso
+            const progressHTML = `
+                <div style="display: flex; flex-direction: column; gap: 1.5rem; padding: 1rem 0;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">⚙️</div>
+                        <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Actualizando CodigoSH</h3>
+                        <p style="font-size: 0.875rem; opacity: 0.7;">Este proceso puede tardar 30-60 segundos</p>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <div class="update-step" id="step-1">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div class="update-spinner"></div>
+                                <span style="font-size: 0.9375rem;">Descargando código fuente...</span>
+                            </div>
+                        </div>
+                        <div class="update-step" id="step-2" style="opacity: 0.4;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div class="update-spinner"></div>
+                                <span style="font-size: 0.9375rem;">Compilando aplicación...</span>
+                            </div>
+                        </div>
+                        <div class="update-step" id="step-3" style="opacity: 0.4;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div class="update-spinner"></div>
+                                <span style="font-size: 0.9375rem;">Reiniciando servicio...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; padding: 1rem; display: none;" id="success-message">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; color: #22c55e;">
+                            <span style="font-size: 1.5rem;">✓</span>
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 0.25rem;">Actualización completada</div>
+                                <div style="font-size: 0.875rem; opacity: 0.8;">Recargando aplicación...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <style>
+                    .update-spinner {
+                        width: 16px;
+                        height: 16px;
+                        border: 2px solid rgba(239, 68, 68, 0.2);
+                        border-top: 2px solid #ef4444;
+                        border-radius: 50%;
+                        animation: spin 1s linear infinite;
+                    }
+                    
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                    
+                    .update-step.completed .update-spinner {
+                        border: 2px solid #22c55e;
+                        border-top: 2px solid #22c55e;
+                        animation: none;
+                        position: relative;
+                    }
+                    
+                    .update-step.completed .update-spinner::after {
+                        content: '✓';
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        color: #22c55e;
+                        font-size: 10px;
+                        font-weight: bold;
+                    }
+                </style>
+            `;
+            
+            updateContent.insertAdjacentHTML('afterend', progressHTML);
+            
+            // Iniciar actualización
             fetch('/perform-update', { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        updateBtn.querySelector('span').textContent = '✓ Actualización iniciada';
-                        // Esperar más tiempo porque la compilación toma más que una descarga
+                        // Paso 1 completado
                         setTimeout(() => {
-                            // Mostrar mensaje de espera
-                            alert('El servicio se está reiniciando con la nueva versión.\nEsto puede tomar 30-60 segundos. Por favor, espera...');
+                            document.getElementById('step-1').classList.add('completed');
+                            document.getElementById('step-1').style.opacity = '1';
+                            document.getElementById('step-2').style.opacity = '1';
+                        }, 1000);
+                        
+                        // Paso 2 completado
+                        setTimeout(() => {
+                            document.getElementById('step-2').classList.add('completed');
+                            document.getElementById('step-3').style.opacity = '1';
+                        }, 15000);
+                        
+                        // Paso 3 completado
+                        setTimeout(() => {
+                            document.getElementById('step-3').classList.add('completed');
+                            document.getElementById('success-message').style.display = 'block';
+                        }, 25000);
+                        
+                        // Recargar después de 30 segundos
+                        setTimeout(() => {
                             window.location.reload();
-                        }, 2000);
+                        }, 30000);
                     } else {
                         throw new Error(data.message || 'Error en la actualización');
                     }

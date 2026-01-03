@@ -25,7 +25,7 @@
 * **Bcrypt:** Hashing seguro de contraseñas
 * **SQLite:** Base de datos ligera e integrada
 * **Aplicación Monolítica:** Single binary, sin dependencias externas
-* **Bajo consumo:** ~50MB RAM en operación normal
+* **Bajo consumo:** ~20-30MB RAM en reposo, ~50MB bajo carga
 
 ---
 
@@ -33,10 +33,10 @@
 
 ### Requisitos Mínimos
 * **OS:** Debian 11+, Ubuntu 20.04+ o compatible con Linux
-* **CPU:** 1 core mínimo (2+ recomendado)
-* **RAM:** 256MB mínimo (512MB recomendado)
-* **Almacenamiento:** 500MB disponible
-* **Net:** Acceso a internet (solo para descargar el script)
+* **CPU:** 1 core (x86_64 o ARM64)
+* **RAM:** 128MB disponible (64MB en uso típico)
+* **Almacenamiento:** 100MB disponible (50MB binario + 50MB espacio de trabajo)
+* **Net:** Puerto 8080 libre (configurable)
 
 ### ⚡ Instalación Rápida
 

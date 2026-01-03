@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="{{.User.Language}}" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodigoSH | Acerca de</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/static/i18n/i18n.js"></script>
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            33% { transform: translateY(-30px) translateX(20px); }
+            66% { transform: translateY(20px) translateX(-20px); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        html.dark body { 
+            background: #0a0a0a; 
+            color: #ffffff;
+        }
+        
+        html:not(.dark) body { 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); 
+            color: #0f172a; 
+        }
+
+        /* Gradientes de fondo */
+        .gradient-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%);
+            top: -200px;
+            right: -200px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.12) 0%, transparent 70%);
+            bottom: -150px;
+            left: -150px;
+            animation-delay: 5s;
+        }
+
+        html:not(.dark) .orb-1,
+        html:not(.dark) .orb-2 {
+            opacity: 0.4;
+        }
+
+        /* Botón de volver */
+        .back-btn {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            z-index: 1000;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            background: rgba(15, 15, 17, 0.8);
+            backdrop-filter: blur(20px);
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+        }
+
+        html:not(.dark) .back-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .back-btn:hover {
+            background: rgba(239, 68, 68, 0.9);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: white;
+            transform: translateX(-4px);
+        }
+
+        /* Container */
+        .about-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 700px;
+            margin: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Card principal */
+        .about-card {
+            background: rgba(15, 15, 17, 0.8);
+            backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 32px;
+            padding: 3.5rem 3rem;
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                0 50px 100px -20px rgba(0, 0, 0, 0.5),
+                0 30px 60px -30px rgba(239, 68, 68, 0.3);
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        html:not(.dark) .about-card {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 
+                0 0 0 1px rgba(0, 0, 0, 0.03),
+                0 50px 100px -20px rgba(0, 0, 0, 0.15),
+                0 30px 60px -30px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Logo */
+        .logo-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 0 auto 2rem;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: white;
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+                0 20px 40px -10px rgba(239, 68, 68, 0.5),
+                0 10px 20px -5px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: pulse 3s infinite ease-in-out;
+        }
+
+        .logo:hover {
+            animation-play-state: paused;
+        }
+
+        /* Título */
+        .brand-name {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        html:not(.dark) .brand-name {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .version {
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 2.5rem;
+            transition: color 0.3s ease;
+        }
+
+        html:not(.dark) .version {
+            color: #64748b;
+        }
+
+        .description {
+            text-align: center;
+            font-size: 1.125rem;
+            line-height: 1.7;
+            color: #cbd5e1;
+            margin-bottom: 3rem;
+            transition: color 0.3s ease;
+        }
+
+        html:not(.dark) .description {
+            color: #475569;
+        }
+
+        /* Features */
+        .features {
+            margin-bottom: 3rem;
+        }
+
+        .features-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
+        html:not(.dark) .features-title {
+            color: #1e293b;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html:not(.dark) .feature-item {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .feature-item:hover {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            color: #ef4444;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .feature-text {
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: #cbd5e1;
+            transition: color 0.3s ease;
+        }
+
+        html:not(.dark) .feature-text {
+            color: #475569;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 2.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            transition: border-color 0.3s ease;
+        }
+
+        html:not(.dark) .footer {
+            border-top-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .footer p {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        html:not(.dark) .footer p {
+            color: #64748b;
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-top: 1rem;
+        }
+
+        .github-link:hover {
+            color: #ef4444;
+        }
+
+        .github-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .about-container {
+                margin: 1rem;
+            }
+
+            .about-card {
+                padding: 2.5rem 2rem;
+            }
+
+            .brand-name {
+                font-size: 2.25rem;
+            }
+
+            .logo {
+                width: 80px;
+                height: 80px;
+                font-size: 2.75rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Gradientes de fondo -->
+    <div class="gradient-bg">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+    </div>
+
+    <!-- Botón volver -->
+    <a href="/dashboard" class="back-btn">
+        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>
+        </svg>
+    </a>
+
+    <!-- Contenido principal -->
+    <div class="about-container">
+        <div class="about-card">
+            <!-- Logo -->
+            <div style="text-align: center;">
+                <div class="logo-wrapper">
+                    <div class="logo">K</div>
+                </div>
+            </div>
+
+            <!-- Título y versión -->
+            <h1 class="brand-name">CodigoSH</h1>
+            <div class="version" data-i18n="about.version" data-version="{{.Version}}"></div>
+
+            <!-- Descripción -->
+            <p class="description" data-i18n="about.description">
+                Una aplicación web moderna para gestionar tus marcadores y enlaces favoritos.
+                Organiza, personaliza y accede rápidamente a tus recursos más importantes.
+            </p>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>Desarrollado con ❤️ usando Go y modern web technologies</p>
+                <p>© 2026 CodigoSH. Todos los derechos reservados.</p>
+                <a href="https://github.com/kiwinh0/CodigoSH" target="_blank" class="github-link">
+                    <svg class="github-icon" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                    </svg>
+                    Ver en GitHub
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función COMPLETA para traducir TODOS los elementos de la página About
+        function translateAboutPage() {
+            const translations = {
+                'Una aplicación web moderna para gestionar tus marcadores y enlaces favoritos. Organiza, personaliza y accede rápidamente a tus recursos más importantes.': i18n.translate('about.description') || 'Una aplicación web moderna para gestionar tus marcadores y enlaces favoritos. Organiza, personaliza y accede rápidamente a tus recursos más importantes.',
+                'Desarrollado con ❤️ usando Go y modern web technologies': i18n.translate('about.developed_with') || 'Desarrollado con ❤️ usando Go y modern web technologies',
+                '© 2026 CodigoSH. Todos los derechos reservados.': i18n.translate('about.copyright') || '© 2026 CodigoSH. Todos los derechos reservados.',
+                'Ver en GitHub': i18n.translate('about.view_on_github') || 'Ver en GitHub'
+            };
+            
+            // Traducir versión con número dinámico
+            const versionEl = document.querySelector('.version');
+            if (versionEl) {
+                const versionNumber = versionEl.getAttribute('data-version');
+                const versionLabel = i18n.translate('about.version') || 'Versión';
+                versionEl.textContent = `${versionLabel} ${versionNumber}`;
+            }
+            
+            // Traducir descripción
+            const descEl = document.querySelector('.description');
+            if (descEl && translations[descEl.textContent.trim()]) {
+                descEl.textContent = translations[descEl.textContent.trim()];
+            }
+            
+            // Traducir footer (desarrollado con...)
+            const footerPs = document.querySelectorAll('.footer p');
+            footerPs.forEach(p => {
+                const text = p.textContent.trim();
+                if (translations[text]) {
+                    p.textContent = translations[text];
+                }
+            });
+            
+            // Traducir link de GitHub
+            const githubLink = document.querySelector('.github-link');
+            if (githubLink) {
+                const linkText = githubLink.textContent.trim();
+                if (translations[linkText]) {
+                    const trans = translations[linkText];
+                    // Preservar el SVG
+                    const svg = githubLink.querySelector('svg');
+                    githubLink.textContent = trans;
+                    if (svg) {
+                        githubLink.appendChild(svg);
+                        githubLink.insertBefore(document.createTextNode(trans), svg);
+                    }
+                }
+            }
+        }
+
+        // Aplicar tema guardado (solo lectura, sin toggle)
+        (function applySavedTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+        })();
+
+        // Inicializar i18n cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            const userLanguage = document.documentElement.lang || 'es';
+            i18n.loadLanguage(userLanguage).then(() => {
+                translateAboutPage();
+                localStorage.setItem('currentLanguage', userLanguage);
+            });
+        });
+    </script>
+</body>
+</html>

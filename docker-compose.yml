@@ -1,0 +1,9 @@
+services:
+  codigosH:
+    build: .
+    container_name: codigosH-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./codigosH.db:/root/codigosH.db
+    restart: unless-stopped

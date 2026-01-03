@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="{{if .User.Language}}{{.User.Language}}{{else}}es{{end}}" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodigoSH | Configuración</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/static/i18n/i18n.js"></script>
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        @keyframes glow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        html.dark body { 
+            background: #0a0a0a; 
+            color: #ffffff;
+        }
+        
+        html:not(.dark) body { 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); 
+            color: #0f172a; 
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .gradient-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, transparent 70%);
+            top: -250px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .gradient-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(185, 28, 28, 0.3) 0%, transparent 70%);
+            bottom: -200px;
+            right: -50px;
+            animation-delay: 5s;
+        }
+
+        .gradient-3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.25) 0%, transparent 70%);
+            top: 50%;
+            right: 10%;
+            animation-delay: 10s;
+        }
+
+        /* Layout */
+        .settings-layout {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Sidebar */
+        .settings-sidebar {
+            width: 320px;
+            background: rgba(15, 15, 17, 0.6);
+            backdrop-filter: blur(40px) saturate(180%);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 2.5rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 10;
+            animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        html:not(.dark) .settings-sidebar {
+            background: rgba(255, 255, 255, 0.7);
+            border-right: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-logo:hover {
+            transform: translateX(5px);
+        }
+
+        .logo-box {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 900;
+            color: white;
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+                0 10px 30px -5px rgba(239, 68, 68, 0.5);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .sidebar-logo:hover .logo-box {
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        .brand-info h1 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.03em;
+        }
+
+        html:not(.dark) .brand-info h1 {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-info p {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        /* Sidebar Menu */
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            color: #94a3b8;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            border: 1.5px solid transparent;
+        }
+
+        html:not(.dark) .sidebar-menu-item {
+            color: #64748b;
+        }
+
+        .sidebar-menu-item:hover {
+            background: rgba(239, 68, 68, 0.08);
+            color: #ef4444;
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu-item.active {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.1) 100%);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .sidebar-menu-item .icon {
+            width: 22px;
+            height: 22px;
+            opacity: 0.7;
+            flex-shrink: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar-menu-item.active .icon,
+        .sidebar-menu-item:hover .icon {
+            opacity: 1;
+        }
+
+        /* Content Area */
+        .settings-content {
+            flex: 1;
+            margin-left: 320px;
+            padding: 3rem;
+            position: relative;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Back button (floating within content) */
+        .back-btn {
+            position: absolute;
+            top: 1.5rem;
+            left: 1rem;
+            z-index: 1000;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            background: rgba(15, 15, 17, 0.8);
+            backdrop-filter: blur(20px);
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+        }
+
+        html:not(.dark) .back-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .back-btn:hover {
+            background: rgba(239, 68, 68, 0.9);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: white;
+            transform: translateX(-4px);
+        }
+
+        .settings-header {
+            margin-bottom: 3rem;
+            padding-left: 3.5rem;
+        }
+
+        .settings-header h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.03em;
+        }
+
+        html:not(.dark) .settings-header h2 {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .settings-header p {
+            font-size: 1.0625rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* Settings Section */
+        .settings-section {
+            display: none;
+        }
+
+        .settings-section.active {
+            display: block;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Settings Card */
+        .settings-card {
+            background: rgba(15, 15, 17, 0.6);
+            backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                0 20px 40px -10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            overflow: visible;
+        }
+
+        html:not(.dark) .settings-card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 
+                0 0 0 1px rgba(0, 0, 0, 0.03),
+                0 20px 40px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.08),
+                0 30px 60px -10px rgba(0, 0, 0, 0.4);
+        }
+
+        html:not(.dark) .settings-card:hover {
+            box-shadow: 
+                0 0 0 1px rgba(0, 0, 0, 0.05),
+                0 30px 60px -10px rgba(0, 0, 0, 0.15);
+        }
+
+        .settings-card h3 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #e2e8f0;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        html:not(.dark) .settings-card h3 {
+            color: #0f172a;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.625rem;
+        }
+
+        html:not(.dark) .form-label {
+            color: #475569;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #ffffff;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html:not(.dark) .form-input {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.08);
+            color: #0f172a;
+        }
+
+        .form-input:focus {
+            background: rgba(239, 68, 68, 0.03);
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .form-input::placeholder {
+            color: #64748b;
+        }
+
+        /* Avatar Section */
+        .avatar-section {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .avatar-preview-wrapper {
+            position: relative;
+        }
+
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 10px 30px -5px rgba(239, 68, 68, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .avatar-preview:hover {
+            transform: scale(1.05);
+            border-color: rgba(239, 68, 68, 0.5);
+            box-shadow: 0 15px 40px -5px rgba(239, 68, 68, 0.6);
+        }
+
+        .avatar-placeholder {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 900;
+            color: white;
+            border: 4px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 10px 30px -5px rgba(239, 68, 68, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .avatar-placeholder:hover {
+            transform: scale(1.05) rotate(-2deg);
+            border-color: rgba(239, 68, 68, 0.5);
+            box-shadow: 0 15px 40px -5px rgba(239, 68, 68, 0.6);
+        }
+
+        .avatar-info {
+            flex: 1;
+        }
+
+        .avatar-info p {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.75rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+                0 10px 30px -5px rgba(239, 68, 68, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+                0 20px 40px -5px rgba(239, 68, 68, 0.6);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        html:not(.dark) .btn-secondary {
+            background: rgba(0, 0, 0, 0.03);
+            color: #0f172a;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-file {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            color: #94a3b8;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        html:not(.dark) .btn-file {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #64748b;
+        }
+
+        .btn-file:hover {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 14px;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            margin-bottom: 1.75rem;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Alert Container - Top Right */
+        .alert-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-width: 400px;
+            pointer-events: none;
+        }
+
+        .alert {
+            pointer-events: all;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1.5px solid rgba(34, 197, 94, 0.4);
+            color: #86efac;
+        }
+
+        html:not(.dark) .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1.5px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+        }
+
+        html:not(.dark) .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+        }
+
+        .alert.fade-out {
+            animation: slideOutRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 14px;
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            background: rgba(15, 15, 17, 0.6);
+            backdrop-filter: blur(20px);
+            color: #94a3b8;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+        }
+
+        html:not(.dark) .theme-toggle {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .theme-toggle:hover {
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+            transform: scale(1.05) rotate(-10deg);
+        }
+
+        /* Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        /* Toggle switch */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 54px;
+            height: 30px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            transition: all 0.25s ease;
+            box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.45) inset;
+        }
+
+        .switch-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 3px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: transform 0.25s ease, background 0.25s ease;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .switch input:checked + .switch-slider {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.85) 0%, rgba(185, 28, 28, 0.9) 100%);
+            border-color: rgba(239, 68, 68, 0.45);
+        }
+
+        .switch input:checked + .switch-slider:before {
+            transform: translateX(22px);
+            background: #fff5f5;
+        }
+
+        html:not(.dark) .switch-slider {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        html:not(.dark) .switch input:checked + .switch-slider {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.9) 0%, rgba(185, 28, 28, 0.9) 100%);
+            border-color: rgba(185, 28, 28, 0.4);
+        }
+
+        .toggle-label {
+            font-weight: 700;
+            font-size: 0.9375rem;
+            color: #e2e8f0;
+        }
+
+        html:not(.dark) .toggle-label {
+            color: #0f172a;
+        }
+
+        /* Language dropdown (settings page) */
+        .language-dropdown {
+            position: relative;
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .language-selected {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        html:not(.dark) .language-selected {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.08);
+            color: #0f172a;
+        }
+
+        .language-selected:hover {
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .language-selected.open {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .language-dropdown-arrow {
+            transition: transform 0.3s;
+            color: #64748b;
+        }
+
+        .language-selected.open .language-dropdown-arrow {
+            transform: rotate(180deg);
+            color: #ef4444;
+        }
+
+        .language-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 17, 0.98);
+            backdrop-filter: blur(40px) saturate(180%);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html:not(.dark) .language-dropdown-menu {
+            background: rgba(255, 255, 255, 0.98);
+            border-color: rgba(0, 0, 0, 0.08);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+        }
+
+        .language-dropdown-menu.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+
+        .language-dropdown-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .language-dropdown-menu::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+
+        .language-dropdown-menu::-webkit-scrollbar-thumb {
+            background: rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+        }
+
+        .language-dropdown-menu::-webkit-scrollbar-thumb:hover {
+            background: rgba(239, 68, 68, 0.5);
+        }
+
+        .language-option {
+            padding: 0.875rem 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        html:not(.dark) .language-option {
+            border-bottom-color: rgba(0, 0, 0, 0.04);
+        }
+
+        .language-option:last-child {
+            border-bottom: none;
+        }
+
+        .language-option:hover {
+            background: rgba(239, 68, 68, 0.08);
+            color: #ef4444;
+        }
+
+        .language-option.selected {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .language-option .flag {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .settings-sidebar {
+                width: 280px;
+            }
+
+            .settings-content {
+                margin-left: 280px;
+                padding: 2rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .settings-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .settings-sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .settings-content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+
+            .settings-header h2 {
+                font-size: 2rem;
+            }
+
+            .avatar-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .theme-toggle {
+                top: 1rem;
+                right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="bg-animation">
+        <div class="bg-gradient gradient-1"></div>
+        <div class="bg-gradient gradient-2"></div>
+        <div class="bg-gradient gradient-3"></div>
+    </div>
+
+    <div class="settings-layout">
+        <!-- Sidebar -->
+        <aside class="settings-sidebar">
+            <a href="/dashboard" class="sidebar-logo">
+                <div class="logo-box">K</div>
+                <div class="brand-info">
+                    <h1>CodigoSH</h1>
+                    <p>Configuración</p>
+                </div>
+            </a>
+
+            <nav class="sidebar-nav">
+                <a href="#user" class="sidebar-menu-item active" data-section="user">
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Usuario
+                </a>
+
+                <a href="#security" class="sidebar-menu-item" data-section="security">
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                    Seguridad
+                </a>
+
+                <a href="#personalization" class="sidebar-menu-item" data-section="personalization">
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm14-4a2 2 0 01-2 2h-4a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12z"></path>
+                    </svg>
+                    Personalización
+                </a>
+
+                <a href="#advanced" class="sidebar-menu-item" data-section="advanced">
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Avanzado
+                </a>
+
+                <div class="sidebar-menu-item" onclick="logout()">
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    Cerrar sesión
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="settings-content">
+            <a href="/dashboard" class="back-btn">
+                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </a>
+            
+            <!-- Alert Container -->
+            <div class="alert-container" id="alert-container"></div>
+
+            <!-- User Section -->
+            <div id="user-section" class="settings-section active">
+                <div class="settings-header">
+                    <h2>Perfil de Usuario</h2>
+                    <p>Gestiona tu información personal y avatar</p>
+                </div>
+
+                <form action="/update-profile" method="POST" enctype="multipart/form-data">
+                    <div class="settings-card">
+                        <h3>Perfil</h3>
+                        <div class="avatar-section">
+                            <div class="avatar-preview-wrapper">
+                                {{if .User.Avatar}}
+                                <img id="avatar-preview" src="data:image/png;base64,{{.User.Avatar}}" alt="Avatar" class="avatar-preview">
+                                {{else}}
+                                <div id="avatar-preview" class="avatar-placeholder">{{slice .User.Username 0 1}}</div>
+                                {{end}}
+                            </div>
+                            <div class="avatar-info" style="min-width: 220px;">
+                                <label class="form-label">Cambiar avatar</label>
+                                <input type="file" name="avatar" id="avatar-input" accept="image/*" style="display: none;" onchange="previewAvatar(this)">
+                                <button type="button" onclick="document.getElementById('avatar-input').click()" class="btn-file">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Seleccionar imagen
+                                </button>
+                                <p>JPG, PNG o GIF. Máximo 2MB. La imagen se previsualizará automáticamente.</p>
+                            </div>
+                            <div class="form-group" style="flex: 1; min-width: 240px; margin-bottom: 0;">
+                                <label class="form-label">Nombre de usuario</label>
+                                <input type="text" name="username" value="{{.User.Username}}" class="form-input" placeholder="Ingresa tu nombre de usuario" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit" class="btn-primary">Guardar cambios</button>
+                        <a href="/dashboard" class="btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Security Section -->
+            <div id="security-section" class="settings-section">
+                <div class="settings-header">
+                    <h2>Seguridad</h2>
+                    <p>Gestiona tu contraseña y configuración de seguridad</p>
+                </div>
+
+                <form action="/update-profile" method="POST">
+                    <div class="settings-card">
+                        <h3>Cambiar Contraseña</h3>
+                        <div class="form-grid">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label">Contraseña actual</label>
+                                <input type="password" name="current_password" class="form-input" placeholder="Ingresa tu contraseña actual" required>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 0;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Nueva contraseña</label>
+                                    <input type="password" name="password" class="form-input" placeholder="Ingresa la nueva contraseña" required>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Confirmar nueva contraseña</label>
+                                    <input type="password" name="password_confirm" class="form-input" placeholder="Confirma la nueva contraseña" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit" class="btn-primary">Cambiar contraseña</button>
+                        <a href="/dashboard" class="btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Personalization Section -->
+            <div id="personalization-section" class="settings-section">
+                <div class="settings-header">
+                    <h2>Personalización</h2>
+                    <p>Personaliza la apariencia y el idioma predeterminado del proyecto</p>
+                </div>
+
+                <form action="/update-profile" method="POST" enctype="multipart/form-data">
+                    <div class="settings-card">
+                        <h3>Tema</h3>
+                        <div class="form-group">
+                            <label class="form-label">Modo de visualización</label>
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                                <div>
+                                    <div style="font-size: 0.9375rem; font-weight: 600; margin-bottom: 0.25rem;">Modo oscuro</div>
+                                    <div style="font-size: 0.8125rem; color: #64748b;">Activa el modo oscuro para una mejor experiencia visual</div>
+                                </div>
+                                <div class="toggle-switch">
+                                    <label class="switch">
+                                        <input type="checkbox" id="themeToggle" aria-label="Alternar tema" {{if ne .User.Theme "light"}}checked{{end}}>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                    <span class="toggle-label" id="themeToggleLabel">Activado</span>
+                                </div>
+                            </div>
+                            <input type="hidden" name="theme" id="themeValue" value="{{if .User.Theme}}{{.User.Theme}}{{else}}dark{{end}}">
+                        </div>
+
+                        <h3 style="margin-top: 2rem;">Idioma del proyecto</h3>
+                        <div class="form-group">
+                            <label class="form-label">Idioma predeterminado</label>
+                            <div class="language-dropdown">
+                                <div class="language-selected" id="languageSelected">
+                                    <span id="selectedLangText">{{if eq .User.Language "en"}}🇺🇸 English{{else if eq .User.Language "fr"}}🇫🇷 Français{{else if eq .User.Language "de"}}🇩🇪 Deutsch{{else if eq .User.Language "it"}}🇮🇹 Italiano{{else if eq .User.Language "pt"}}🇵🇹 Português{{else if eq .User.Language "ru"}}🇷🇺 Русский{{else if eq .User.Language "ja"}}🇯🇵 日本語{{else if eq .User.Language "zh"}}🇨🇳 中文{{else if eq .User.Language "ko"}}🇰🇷 한국어{{else if eq .User.Language "ar"}}🇸🇦 العربية{{else if eq .User.Language "hi"}}🇮🇳 हिन्दी{{else if eq .User.Language "nl"}}🇳🇱 Nederlands{{else if eq .User.Language "sv"}}🇸🇪 Svenska{{else if eq .User.Language "pl"}}🇵🇱 Polski{{else if eq .User.Language "tr"}}🇹🇷 Türkçe{{else if eq .User.Language "vi"}}🇻🇳 Tiếng Việt{{else if eq .User.Language "th"}}🇹🇭 ไทย{{else if eq .User.Language "id"}}🇮🇩 Bahasa{{else if eq .User.Language "el"}}🇬🇷 Ελληνικά{{else}}🇪🇸 Español{{end}}</span>
+                                    <span class="language-dropdown-arrow">▼</span>
+                                </div>
+                                <div class="language-dropdown-menu" id="languageDropdownMenu">
+                                    <div class="language-option {{if or (eq .User.Language "es") (eq .User.Language "")}}selected{{end}}" data-lang="es" data-text="🇪🇸 Español"><span class="flag">🇪🇸</span> Español</div>
+                                    <div class="language-option {{if eq .User.Language "en"}}selected{{end}}" data-lang="en" data-text="🇺🇸 English"><span class="flag">🇺🇸</span> English</div>
+                                    <div class="language-option {{if eq .User.Language "fr"}}selected{{end}}" data-lang="fr" data-text="🇫🇷 Français"><span class="flag">🇫🇷</span> Français</div>
+                                    <div class="language-option {{if eq .User.Language "de"}}selected{{end}}" data-lang="de" data-text="🇩🇪 Deutsch"><span class="flag">🇩🇪</span> Deutsch</div>
+                                    <div class="language-option {{if eq .User.Language "it"}}selected{{end}}" data-lang="it" data-text="🇮🇹 Italiano"><span class="flag">🇮🇹</span> Italiano</div>
+                                    <div class="language-option {{if eq .User.Language "pt"}}selected{{end}}" data-lang="pt" data-text="🇵🇹 Português"><span class="flag">🇵🇹</span> Português</div>
+                                    <div class="language-option {{if eq .User.Language "ru"}}selected{{end}}" data-lang="ru" data-text="🇷🇺 Русский"><span class="flag">🇷🇺</span> Русский</div>
+                                    <div class="language-option {{if eq .User.Language "zh"}}selected{{end}}" data-lang="zh" data-text="🇨🇳 中文"><span class="flag">🇨🇳</span> 中文</div>
+                                    <div class="language-option {{if eq .User.Language "ja"}}selected{{end}}" data-lang="ja" data-text="🇯🇵 日本語"><span class="flag">🇯🇵</span> 日本語</div>
+                                    <div class="language-option {{if eq .User.Language "ko"}}selected{{end}}" data-lang="ko" data-text="🇰🇷 한국어"><span class="flag">🇰🇷</span> 한국어</div>
+                                    <div class="language-option {{if eq .User.Language "ar"}}selected{{end}}" data-lang="ar" data-text="🇸🇦 العربية"><span class="flag">🇸🇦</span> العربية</div>
+                                    <div class="language-option {{if eq .User.Language "hi"}}selected{{end}}" data-lang="hi" data-text="🇮🇳 हिन्दी"><span class="flag">🇮🇳</span> हिन्दी</div>
+                                    <div class="language-option {{if eq .User.Language "nl"}}selected{{end}}" data-lang="nl" data-text="🇳🇱 Nederlands"><span class="flag">🇳🇱</span> Nederlands</div>
+                                    <div class="language-option {{if eq .User.Language "sv"}}selected{{end}}" data-lang="sv" data-text="🇸🇪 Svenska"><span class="flag">🇸🇪</span> Svenska</div>
+                                    <div class="language-option {{if eq .User.Language "pl"}}selected{{end}}" data-lang="pl" data-text="🇵🇱 Polski"><span class="flag">🇵🇱</span> Polski</div>
+                                    <div class="language-option {{if eq .User.Language "tr"}}selected{{end}}" data-lang="tr" data-text="🇹🇷 Türkçe"><span class="flag">🇹🇷</span> Türkçe</div>
+                                    <div class="language-option {{if eq .User.Language "vi"}}selected{{end}}" data-lang="vi" data-text="🇻🇳 Tiếng Việt"><span class="flag">🇻🇳</span> Tiếng Việt</div>
+                                    <div class="language-option {{if eq .User.Language "th"}}selected{{end}}" data-lang="th" data-text="🇹🇭 ไทย"><span class="flag">🇹🇭</span> ไทย</div>
+                                    <div class="language-option {{if eq .User.Language "id"}}selected{{end}}" data-lang="id" data-text="🇮🇩 Bahasa"><span class="flag">🇮🇩</span> Bahasa</div>
+                                    <div class="language-option {{if eq .User.Language "el"}}selected{{end}}" data-lang="el" data-text="🇬🇷 Ελληνικά"><span class="flag">🇬🇷</span> Ελληνικά</div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="language" id="languageInput" value="{{if .User.Language}}{{.User.Language}}{{else}}es{{end}}">
+                            <div style="font-size: 0.8125rem; color: #64748b; margin-top: 0.5rem;">Esta selección actualizará el idioma predeterminado del proyecto.</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit" class="btn-primary">Guardar preferencias</button>
+                        <a href="/dashboard" class="btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Advanced Section -->
+            <div id="advanced-section" class="settings-section">
+                <div class="settings-header">
+                    <h2 data-i18n="settings.advancedConfig">Configuración Avanzada</h2>
+                    <p data-i18n="settings.advancedDescription">Opciones avanzadas para usuarios experimentados</p>
+                </div>
+
+                <div class="settings-card">
+                    <h3 data-i18n="settings.database">Base de Datos</h3>
+                    <div class="form-group">
+                        <p style="font-size: 0.9375rem; color: #64748b; margin-bottom: 1.5rem;" data-i18n="settings.exportImportDescription">
+                            Exportar o importar tus datos. Esta acción puede tomar tiempo dependiendo del tamaño de tu base de datos.
+                        </p>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button type="button" class="btn-secondary" onclick="exportData()" data-i18n="settings.exportData">Exportar datos</button>
+                            <label for="import-file-input" class="btn-secondary" style="margin: 0; cursor: pointer;" data-i18n="settings.importData">
+                                Importar datos
+                            </label>
+                            <input type="file" id="import-file-input" accept=".json" style="display: none;" onchange="importData(event)">
+                        </div>
+                        <div id="import-status" style="margin-top: 1rem; font-size: 0.875rem; display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Theme toggle switch
+        function applyThemeFromToggle() {
+            const toggle = document.getElementById('themeToggle');
+            const label = document.getElementById('themeToggleLabel');
+            const hidden = document.getElementById('themeValue');
+
+            if (!toggle || !label || !hidden) return;
+
+            const isDark = toggle.checked;
+            document.documentElement.classList.toggle('dark', isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            hidden.value = isDark ? 'dark' : 'light';
+            label.textContent = isDark ? 'Activado' : 'Desactivado';
+        }
+
+        // Load saved theme and language defaults
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load user's language from backend
+            const userLanguage = '{{.User.Language}}' || 'es';
+            
+            // Set i18n language and load translations
+            if (window.i18n) {
+                window.i18n.loadLanguage(userLanguage).then(() => {
+                    window.i18n.updatePageLanguage();
+                    // Translate settings page content
+                    translateSettingsPage();
+                    // Persist to localStorage so it's remembered for other pages
+                    window.i18n.persistLanguage(userLanguage);
+                    
+                    // Show alerts after translations are loaded
+                    checkAndShowAlerts();
+                });
+            }
+            
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                if (savedTheme === 'light') {
+                    themeToggle.checked = false;
+                } else if (savedTheme === 'dark') {
+                    themeToggle.checked = true;
+                }
+                applyThemeFromToggle();
+                themeToggle.addEventListener('change', applyThemeFromToggle);
+            }
+
+            // Language dropdown handlers
+            const languageSelected = document.getElementById('languageSelected');
+            const languageDropdownMenu = document.getElementById('languageDropdownMenu');
+            const selectedLangText = document.getElementById('selectedLangText');
+            const languageInput = document.getElementById('languageInput');
+
+            if (languageSelected && languageDropdownMenu) {
+                languageSelected.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    languageDropdownMenu.classList.toggle('open');
+                    languageSelected.classList.toggle('open');
+                    
+                    if (languageDropdownMenu.classList.contains('open')) {
+                        setTimeout(() => {
+                            const rect = languageSelected.getBoundingClientRect();
+                            const dropdownHeight = languageDropdownMenu.offsetHeight;
+                            const spaceBelow = window.innerHeight - rect.bottom;
+                            const spaceAbove = rect.top;
+                            
+                            if (spaceBelow < dropdownHeight + 20 && spaceAbove > dropdownHeight + 20) {
+                                // Open upwards
+                                languageDropdownMenu.style.top = 'auto';
+                                languageDropdownMenu.style.bottom = 'calc(100% + 0.5rem)';
+                            } else {
+                                // Open downwards (default)
+                                languageDropdownMenu.style.top = 'calc(100% + 0.5rem)';
+                                languageDropdownMenu.style.bottom = 'auto';
+                            }
+                        }, 0);
+                    }
+                });
+
+                document.querySelectorAll('.language-option').forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const lang = this.dataset.lang;
+                        const text = this.dataset.text;
+                        
+                        selectedLangText.textContent = text;
+                        languageInput.value = lang;
+                        
+                        document.querySelectorAll('.language-option').forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                        
+                        languageDropdownMenu.classList.remove('open');
+                        languageSelected.classList.remove('open');
+                        
+                        // Load and persist the selected language immediately
+                        if (window.i18n) {
+                            window.i18n.loadLanguage(lang).then(() => {
+                                window.i18n.updatePageLanguage();
+                                // Translate settings page content
+                                translateSettingsPage();
+                                window.i18n.persistLanguage(lang);
+                            });
+                        }
+                        
+                        localStorage.setItem('projectLanguage', lang);
+                    });
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!languageSelected.contains(e.target) && !languageDropdownMenu.contains(e.target)) {
+                        languageDropdownMenu.classList.remove('open');
+                        languageSelected.classList.remove('open');
+                    }
+                });
+            }
+
+            // Navigation between sections
+            document.querySelectorAll('.sidebar-menu-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (this.hasAttribute('href') && this.getAttribute('href').startsWith('#')) {
+                        e.preventDefault();
+                        const section = this.getAttribute('data-section');
+                        
+                        // Update active menu item
+                        document.querySelectorAll('.sidebar-menu-item').forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Show corresponding section
+                        document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+                        const targetSection = document.getElementById(section + '-section');
+                        if (targetSection) {
+                            targetSection.classList.add('active');
+                            // Scroll to top
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                        
+                        // Update URL hash
+                        window.location.hash = section;
+                    }
+                });
+            });
+
+            // Handle initial load with hash
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const menuItem = document.querySelector(`[data-section="${hash}"]`);
+                if (menuItem) {
+                    menuItem.click();
+                }
+            }
+        });
+
+        // Handle browser back/forward
+        window.addEventListener('hashchange', function() {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const menuItem = document.querySelector(`[data-section="${hash}"]`);
+                if (menuItem) {
+                    menuItem.click();
+                }
+            }
+        });
+
+        // Avatar preview
+        function previewAvatar(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Validar tamaño (2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('El archivo es demasiado grande. Máximo 2MB.');
+                    input.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('avatar-preview');
+                    if (preview.tagName === 'IMG') {
+                        preview.src = e.target.result;
+                    } else {
+                        // Reemplazar placeholder con imagen
+                        const img = document.createElement('img');
+                        img.id = 'avatar-preview';
+                        img.src = e.target.result;
+                        img.className = 'avatar-preview';
+                        preview.parentNode.replaceChild(img, preview);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Logout
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(() => {
+                    window.location.href = '/login';
+                })
+                .catch(err => {
+                    console.error('Logout failed', err);
+                    window.location.href = '/login';
+                });
+        }
+
+        // Manual translation mapping for settings page
+        // Maps Spanish text to i18n settingsPage keys for complete localization
+        const settingsTranslations = {
+            // Headers and Titles
+            'Configuración': 'settingsPage.titulo_principal',
+            'Perfil de Usuario': 'settingsPage.perfil_usuario',
+            'Gestiona tu información personal y avatar': 'settingsPage.gestiona_informacion',
+            'Perfil': 'settingsPage.perfil',
+            'Cambiar avatar': 'settingsPage.cambiar_avatar',
+            'Seleccionar imagen': 'settingsPage.seleccionar_imagen',
+            'JPG, PNG o GIF. Máximo 2MB. La imagen se previsualizará automáticamente.': 'settingsPage.jpg_png_gif',
+            'Nombre de usuario': 'settingsPage.nombre_usuario',
+            'Ingresa tu nombre de usuario': 'settingsPage.ingresa_nombre_usuario',
+            'Guardar cambios': 'settingsPage.guardar_cambios',
+            // Security Section
+            'Seguridad': 'settingsPage.seguridad',
+            'Gestiona tu contraseña y configuración de seguridad': 'settingsPage.gestiona_contrasena',
+            'Cambiar Contraseña': 'settingsPage.cambiar_contrasena',
+            'Contraseña actual': 'settingsPage.contrasena_actual',
+            'Ingresa tu contraseña actual': 'settingsPage.ingresa_contrasena_actual',
+            'Nueva contraseña': 'settingsPage.nueva_contrasena',
+            'Ingresa la nueva contraseña': 'settingsPage.ingresa_nueva_contrasena',
+            'Confirmar nueva contraseña': 'settingsPage.confirmar_nueva_contrasena',
+            'Confirma la nueva contraseña': 'settingsPage.confirma_nueva_contrasena',
+            // Personalization Section
+            'Personalización': 'settingsPage.personalizacion',
+            'Personaliza la apariencia y el idioma predeterminado del proyecto': 'settingsPage.personaliza_apariencia',
+            'Tema': 'settingsPage.tema',
+            'Modo de visualización': 'settingsPage.modo_visualizacion',
+            'Modo oscuro': 'settingsPage.modo_oscuro',
+            'Activa el modo oscuro para una mejor experiencia visual': 'settingsPage.activa_modo_oscuro',
+            'Idioma del proyecto': 'settingsPage.idioma_proyecto',
+            'Idioma predeterminado': 'settingsPage.idioma_predeterminado',
+            'Esta selección actualizará el idioma predeterminado del proyecto.': 'settingsPage.seleccion_actualizara_idioma',
+            'Guardar preferencias': 'settingsPage.guardar_preferencias',
+            // Advanced Section
+            'Configuración Avanzada': 'settingsPage.configuracion_avanzada',
+            'Opciones avanzadas para usuarios experimentados': 'settingsPage.opciones_usuarios_experimentados',
+            'Base de Datos': 'settingsPage.base_datos',
+            'Exportar o importar tus datos. Esta acción puede tomar tiempo dependiendo del tamaño de tu base de datos.': 'settingsPage.exportar_importar',
+            'Exportar datos': 'settingsPage.exportar_datos',
+            'Importar datos': 'settingsPage.importar_datos',
+            // Common Actions
+            'Cancelar': 'settingsPage.cancelar',
+            'Cerrar sesión': 'settingsPage.cerrar_sesion',
+            'Usuario': 'settingsPage.usuario',
+            'Avanzado': 'settingsPage.avanzado',
+            // Theme Labels
+            'Activado': 'settingsPage.activado',
+            'Desactivado': 'settingsPage.desactivado',
+            // Alert Messages
+            'Perfil actualizado correctamente': 'settingsPage.perfil_actualizado'
+        };
+
+        // Función para traducir el contenido visible de la página
+        function translateSettingsPage() {
+            if (!window.i18n) return;
+            
+            // Traducir elementos con data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                const translation = window.i18n.translate(key);
+                if (translation) {
+                    el.textContent = translation;
+                }
+            });
+
+            // Traducir placeholders con data-i18n-placeholder
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                const translation = window.i18n.translate(key);
+                if (translation) {
+                    el.placeholder = translation;
+                }
+            });
+
+            // Sistema legacy: Traducir nodos de texto usando settingsTranslations
+            const walker = document.createTreeWalker(
+                document.body,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+
+            let node;
+            const nodesToTranslate = [];
+            
+            while (node = walker.nextNode()) {
+                const text = node.textContent.trim();
+                if (text && text.length > 0 && settingsTranslations[text]) {
+                    nodesToTranslate.push({ 
+                        node, 
+                        text, 
+                        key: settingsTranslations[text] 
+                    });
+                }
+            }
+
+            nodesToTranslate.forEach(item => {
+                const translation = window.i18n.t(item.key);
+                if (translation && translation !== item.key && translation !== item.text) {
+                    item.node.textContent = translation;
+                }
+            });
+
+            // Traducir placeholders legacy
+            document.querySelectorAll('input[placeholder]').forEach(input => {
+                const placeholder = input.placeholder;
+                if (settingsTranslations[placeholder]) {
+                    const translation = window.i18n.t(settingsTranslations[placeholder]);
+                    if (translation && translation !== settingsTranslations[placeholder]) {
+                        input.placeholder = translation;
+                    }
+                }
+            });
+
+            // Traducir aria-labels
+            document.querySelectorAll('[aria-label]').forEach(element => {
+                const label = element.getAttribute('aria-label');
+                if (settingsTranslations[label]) {
+                    const translation = window.i18n.t(settingsTranslations[label]);
+                    if (translation && translation !== settingsTranslations[label]) {
+                        element.setAttribute('aria-label', translation);
+                    }
+                }
+            });
+        }
+
+        // Alert System with i18n
+        function showAlert(type, messageKey) {
+            const container = document.getElementById('alert-container');
+            if (!container) return;
+
+            const message = window.i18n.translate(messageKey);
+            const icon = type === 'success' ? '✓' : '✕';
+
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <span style="font-size: 1.25rem;">${icon}</span>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(alert);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                alert.classList.add('fade-out');
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        }
+
+        // Check URL params and show alerts (called after i18n is loaded)
+        function checkAndShowAlerts() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const success = urlParams.get('success');
+            const error = urlParams.get('error');
+
+            if (success === 'profile_updated') {
+                showAlert('success', 'settings.profileUpdated');
+            }
+
+            const errorMessages = {
+                'invalid_current_password': 'settings.invalidPassword',
+                'current_password_required': 'settings.passwordRequired',
+                'password_mismatch': 'settings.passwordMismatch',
+                'username_exists': 'settings.usernameExists',
+                'invalid_file_type': 'settings.invalidFileType'
+            };
+
+            if (error && errorMessages[error]) {
+                showAlert('error', errorMessages[error]);
+            }
+        }
+
+        // Export data
+        async function exportData() {
+            try {
+                const response = await fetch('/export-data', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al exportar datos');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const date = new Date().toISOString().split('T')[0];
+                a.download = `codigosh-backup-${date}.json`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showImportStatus('✅ Datos exportados correctamente', 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                showImportStatus('❌ Error al exportar datos', 'error');
+            }
+        }
+
+        // Import data
+        async function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const statusDiv = document.getElementById('import-status');
+            statusDiv.textContent = '⏳ Importando datos...';
+            statusDiv.style.display = 'block';
+            statusDiv.style.color = '#3b82f6';
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('/import-data', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Error al importar datos');
+                }
+
+                showImportStatus(`✅ ${result.message}`, 'success');
+                
+                // Reload page after 2 seconds
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } catch (error) {
+                console.error('Error:', error);
+                showImportStatus(`❌ ${error.message}`, 'error');
+            }
+
+            // Reset file input
+            event.target.value = '';
+        }
+
+        function showImportStatus(message, type) {
+            const statusDiv = document.getElementById('import-status');
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            statusDiv.style.color = type === 'success' ? '#10b981' : '#ef4444';
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+# Binarios
+bin/
+codigosH
+kiwilab
+
+# Bases de datos
+*.db
+*.db-shm
+*.db-wal
+*.db.backup
+
+# Logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.swp
+.DS_Store
+
+# Uploads
+web/static/uploads/*
+!web/static/uploads/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.iml

@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="{{.User.Language}}" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodigoSH | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="/static/i18n/i18n.js"></script>
+    
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            33% { transform: translateY(-30px) translateX(20px); }
+            66% { transform: translateY(20px) translateX(-20px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: translate(-50%, -50%) scale(0.95); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.3); opacity: 0; }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        html.dark body { 
+            background: #0a0a0a; 
+            color: #ffffff;
+        }
+        
+        html:not(.dark) body { 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); 
+            color: #0f172a; 
+        }
+
+        /* Gradientes flotantes de fondo */
+        .gradient-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%);
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.12) 0%, transparent 70%);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: 5s;
+        }
+
+        .orb-3 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.08) 0%, transparent 70%);
+            top: 50%;
+            right: 20%;
+            animation-delay: 10s;
+        }
+
+        html:not(.dark) .orb-1,
+        html:not(.dark) .orb-2,
+        html:not(.dark) .orb-3 {
+            opacity: 0.4;
+        }
+
+        /* Navbar con glassmorphism */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(40px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        html:not(.dark) nav {
+            background: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        /* Logo con animación */
+        .logo-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: white;
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+                0 10px 30px -5px rgba(239, 68, 68, 0.5);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .logo:hover {
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        .brand-text {
+            font-size: 1.125rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        html:not(.dark) .brand-text {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-subtitle {
+            font-size: 0.625rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            transition: color 0.3s ease;
+        }
+
+        html:not(.dark) .brand-subtitle {
+            color: #64748b;
+        }
+
+        /* Búsqueda mejorada */
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #global-search {
+            width: 100%;
+            padding: 0.875rem 1.125rem 0.875rem 3rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #ffffff;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html:not(.dark) #global-search {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.08);
+            color: #0f172a;
+        }
+
+        #global-search:focus {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        #global-search::placeholder {
+            color: #64748b;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.125rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* Botones de acción del navbar */
+        .nav-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html:not(.dark) .nav-btn {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            transform: translateY(-2px);
+        }
+
+        /* Avatar */
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .user-avatar:hover {
+            border-color: #ef4444;
+            transform: scale(1.05);
+        }
+
+        /* Badge de actualización */
+        .update-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 16px;
+            height: 16px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid #0a0a0a;
+            animation: pulse 2s infinite;
+        }
+
+        html:not(.dark) .update-badge {
+            border-color: #f8fafc;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        }
+
+        .user-avatar-placeholder {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: white;
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar-placeholder:hover {
+            border-color: #ef4444;
+            transform: scale(1.05);
+        }
+
+        /* Dropdowns */
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            width: 220px;
+            background: rgba(15, 15, 17, 0.95);
+            backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            padding: 0.5rem;
+        }
+
+        html:not(.dark) .dropdown-menu {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(0, 0, 0, 0.08);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+        }
+
+        .dropdown-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        html:not(.dark) .dropdown-item {
+            color: #334155;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .dropdown-item.logout {
+            color: #ef4444;
+        }
+
+        .dropdown-item .icon {
+            width: 18px;
+            height: 18px;
+            opacity: 0.7;
+            flex-shrink: 0;
+        }
+
+        /* Grid de cards con animación */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 2rem;
+            padding: 3rem;
+            position: relative;
+            z-index: 1;
+            animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 1.5rem;
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        /* Cards con glassmorphism */
+        .card {
+            aspect-ratio: 1/1;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        html:not(.dark) .card {
+            background: rgba(255, 255, 255, 0.6);
+            border-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 20px 60px -10px rgba(239, 68, 68, 0.3);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            width: 4rem;
+            height: 4rem;
+            object-fit: contain;
+            margin-bottom: 1rem;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+        }
+
+        .card:hover .card-icon {
+            transform: scale(1.1) rotate(-3deg);
+        }
+
+        .card-title {
+            font-size: 0.625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 0 1rem;
+            transition: color 0.3s ease;
+        }
+
+        html:not(.dark) .card-title {
+            color: #475569;
+        }
+
+        .card:hover .card-title {
+            color: #ef4444;
+        }
+
+        .hidden-card {
+            display: none;
+        }
+
+        /* Modo edición */
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-1deg); }
+            75% { transform: rotate(1deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        body.editing .card {
+            animation: shake 0.4s infinite ease-in-out;
+            border: 2px dashed rgba(239, 68, 68, 0.5);
+        }
+
+        .action-btn {
+            position: absolute;
+            top: 0.5rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 700;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        body.editing .action-btn {
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .add-dropdown-container {
+            display: none;
+        }
+
+        body.editing .add-dropdown-container {
+            display: block;
+        }
+
+        .del-btn {
+            right: 0.5rem;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .del-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5);
+        }
+
+        .edit-item-btn {
+            right: 3rem;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        .edit-item-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Modal con glassmorphism */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(15, 15, 17, 0.95);
+            backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 2.5rem;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html:not(.dark) .modal-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .modal-title {
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        html:not(.dark) .modal-title {
+            color: #64748b;
+        }
+
+        /* Inputs del modal */
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        html:not(.dark) .form-label {
+            color: #475569;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1.125rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #ffffff;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html:not(.dark) .form-input {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.08);
+            color: #0f172a;
+        }
+
+        .form-input:focus {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #64748b;
+        }
+
+        /* Grid de iconos */
+        .icon-list-grid {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 14px;
+            padding: 0.75rem;
+            max-height: 160px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        html:not(.dark) .icon-list-grid {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .icon-opt {
+            border-radius: 10px;
+            padding: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .icon-opt:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Botones */
+        .btn-primary {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px -5px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px -5px rgba(239, 68, 68, 0.6);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.75rem;
+        }
+
+        .btn-secondary:hover {
+            color: #ef4444;
+        }
+
+        /* Badge online */
+        .badge-online {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 9999px;
+            font-size: 0.625rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #22c55e;
+        }
+
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(239, 68, 68, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(239, 68, 68, 0.5);
+        }
+
+        /* Mensaje de confirmación */
+        .confirm-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: #ef4444;
+        }
+
+        .confirm-title {
+            font-size: 0.875rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #e2e8f0;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        html:not(.dark) .confirm-title {
+            color: #0f172a;
+        }
+
+        .confirm-text {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+
+        html:not(.dark) .confirm-text {
+            color: #64748b;
+        }
+
+        /* GitHub link */
+        .github-link {
+            opacity: 0.3;
+            transition: all 0.3s ease;
+            color: inherit;
+        }
+
+        .github-link:hover {
+            opacity: 1;
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Gradientes de fondo animados -->
+    <div class="gradient-bg">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav style="padding: 1.25rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <!-- Logo y marca -->
+        <div style="display: flex; align-items: center; gap: 1rem; flex: 0 0 25%;">
+            <a href="/dashboard" style="display: flex; align-items: center; gap: 1rem; text-decoration: none; transition: opacity 0.3s ease;">
+                <div class="logo-wrapper">
+                    <div class="logo">K</div>
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <h1 class="brand-text">CodigoSH</h1>
+                        <a href="https://github.com/kiwinh0/CodigoSH" target="_blank" class="github-link">
+                            <svg style="width: 16px; height: 16px;" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                            </svg>
+                        </a>
+                    </div>
+                    <p class="brand-subtitle">Dashboard</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Búsqueda -->
+        <div class="search-container">
+            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="2.5"></path>
+            </svg>
+            <input type="text" id="global-search" placeholder="Buscar servicios..." oninput="filterDashboard(this.value)">
+        </div>
+
+        <!-- Acciones -->
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex: 0 0 25%; justify-content: flex-end;">
+            <!-- Botón añadir (solo visible en modo edición) -->
+            <div style="position: relative;" class="add-dropdown-container" style="display: none;">
+                <button onclick="toggleAddMenu()" class="nav-btn" id="add-dropdown-btn">
+                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 4v16m8-8H4" stroke-width="2"></path>
+                    </svg>
+                </button>
+                <div class="dropdown-menu" id="add-dropdown-menu">
+                    <button onclick="openModal('add')" class="dropdown-item">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-width="2"></path>
+                        </svg>
+                        <span data-i18n="dashboard.addBookmark">Añadir marcador</span>
+                    </button>
+                    <!-- Oculto hasta próximas actualizaciones
+                    <button onclick="openModal('group')" class="dropdown-item">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-width="2"></path>
+                        </svg>
+                        <span data-i18n="dashboard.addGroup">Añadir grupo</span>
+                    </button>
+                    <button onclick="openModal('section')" class="dropdown-item">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v2H4V6z" stroke-width="2"></path>
+                            <path d="M4 10h16v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8z" stroke-width="2"></path>
+                        </svg>
+                        <span data-i18n="dashboard.addSection">Añadir sección</span>
+                    </button>
+                    -->
+                </div>
+            </div>
+
+            <!-- Botón editar -->
+            <button onclick="toggleEditMode()" class="nav-btn" id="edit-btn">
+                <svg id="pencil-icon" style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-width="2"></path>
+                </svg>
+                <svg id="pencil-slash-icon" style="width: 20px; height: 20px; display: none;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-width="2"></path>
+                    <path d="M3 3l18 18" stroke-width="2"></path>
+                </svg>
+            </button>
+
+            <!-- Avatar y menú usuario -->
+            <div style="position: relative;">
+                {{if .User.Avatar}}
+                <img src="data:image/png;base64,{{.User.Avatar}}" alt="Avatar" class="user-avatar" id="user-avatar-img" onclick="toggleUserMenu()">
+                {{else}}
+                <div class="user-avatar-placeholder" id="user-avatar-placeholder" onclick="toggleUserMenu()">{{printf "%.1s" .User.Username}}</div>
+                {{end}}
+                <div class="update-badge" id="update-badge" style="display: none;"></div>
+                
+                <div class="dropdown-menu" id="user-menu">
+                    <a href="/settings" class="dropdown-item">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-width="2"></path>
+                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2"></path>
+                        </svg>
+                        <span data-i18n="dashboard.settings">Preferencias</span>
+                    </a>
+                    <div id="update-menu-item" class="dropdown-item" style="display: none; cursor: pointer; color: #ef4444; font-weight: 500;" onclick="openUpdateModal()">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="2"></path>
+                        </svg>
+                        <span data-i18n="dashboard.updateAvailable">Actualización disponible</span>
+                    </div>
+                    <a href="/about" class="dropdown-item">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2"></path>
+                        </svg>
+                        <span data-i18n="dashboard.about">Acerca de</span>
+                    </a>
+                    <div class="dropdown-item logout" onclick="logout()">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-width="2"></path>
+                        </svg>
+                        <span data-i18n="dashboard.logout">Cerrar sesión</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Grid de marcadores -->
+    <main class="dashboard-grid" id="main-grid">
+        {{range .Bookmarks}}
+        <div class="card" id="card-{{.ID}}" data-id="{{.ID}}" data-title="{{.Title}}" data-url="{{.URL}}" data-icon="{{.Icon}}" onclick="if(!isEditing) window.open('{{.URL}}', '_blank')">
+            <button class="action-btn del-btn" onclick="event.stopPropagation(); confirmDelete('{{.ID}}', '{{.Title}}')">✕</button>
+            <button class="action-btn edit-item-btn" onclick="event.stopPropagation(); openModal('edit', {id:'{{.ID}}', title:'{{.Title}}', url:'{{.URL}}', icon:'{{.Icon}}'})">✎</button>
+            {{if .Icon}}
+            <img src="https://raw.githubusercontent.com/selfhst/icons/main/webp/{{.Icon}}.webp" class="card-icon" onerror="this.src='https://api.lucide.dev/icons/box/64/ef4444.png'" loading="lazy">
+            {{else}}
+            <img src="https://api.lucide.dev/icons/box/64/ef4444.png" class="card-icon" loading="lazy">
+            {{end}}
+            <span class="card-title">{{.Title}}</span>
+        </div>
+        {{end}}
+    </main>
+
+    <!-- Modal de actualización -->
+    <div id="update-modal" class="hidden modal-overlay">
+        <div class="modal-box" style="max-width: 500px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 class="modal-title" data-i18n="dashboard.updateTitle" style="margin: 0;">Actualización disponible</h2>
+                <button onclick="closeUpdateModal()" style="background: none; border: none; color: inherit; font-size: 1.5rem; cursor: pointer;">✕</button>
+            </div>
+
+            <div id="update-content" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <p style="font-size: 0.875rem; opacity: 0.7; margin-bottom: 0.25rem;" data-i18n="dashboard.newVersion">Nueva versión:</p>
+                    <p id="update-version" style="font-size: 1.25rem; font-weight: 600; color: #ef4444;"></p>
+                </div>
+
+                <div>
+                    <p style="font-size: 0.875rem; opacity: 0.7; margin-bottom: 0.25rem;" data-i18n="dashboard.releaseDate">Fecha de lanzamiento:</p>
+                    <p id="update-date" style="font-size: 0.9375rem;"></p>
+                </div>
+
+                <div>
+                    <p style="font-size: 0.875rem; opacity: 0.7; margin-bottom: 0.5rem;" data-i18n="dashboard.mainChanges">Principales cambios:</p>
+                    <ul id="update-changes" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+                    </ul>
+                </div>
+
+                <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+                    <a href="https://github.com/kiwinh0/CodigoSH/releases/latest" target="_blank" style="flex: 1; padding: 0.75rem 1rem; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; text-align: center; text-decoration: none; font-weight: 500; transition: all 0.3s ease;">
+                        <span data-i18n="dashboard.viewReleaseNotes">Ver notas de lanzamiento</span>
+                    </a>
+                    <button onclick="closeUpdateModal()" style="flex: 1; padding: 0.75rem 1rem; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1.5px solid rgba(239, 68, 68, 0.3); border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">
+                        <span data-i18n="dashboard.later">Más tarde</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Rellenar información del modal de actualización
+        function populateUpdateModal() {
+            const updateInfo = sessionStorage.getItem('updateInfo');
+            if (!updateInfo) return;
+
+            try {
+                const data = JSON.parse(updateInfo);
+                document.getElementById('update-version').textContent = data.available_version;
+                
+                // Formatear fecha
+                const date = new Date(data.release_date);
+                const formattedDate = date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+                document.getElementById('update-date').textContent = formattedDate;
+
+                // Llenar cambios
+                const changesList = document.getElementById('update-changes');
+                changesList.innerHTML = '';
+                data.changes.forEach(change => {
+                    const li = document.createElement('li');
+                    li.style.display = 'flex';
+                    li.style.gap = '0.5rem';
+                    li.style.fontSize = '0.9375rem';
+                    li.innerHTML = `<span style="color: #ef4444; margin-top: 2px;">→</span><span>${change}</span>`;
+                    changesList.appendChild(li);
+                });
+            } catch (e) {
+                console.warn('Error populating update modal:', e);
+            }
+        }
+
+        // Llamar cuando se abre el modal
+        document.addEventListener('DOMContentLoaded', function() {
+            populateUpdateModal();
+        });
+    </script>
+
+    <!-- Modal añadir/editar -->
+    <div id="modal" class="hidden modal-overlay">
+        <div class="modal-box">
+            <form id="modal-form" onsubmit="return handleFormSubmit(event)">
+                <input type="hidden" name="id" id="form-id">
+                <h2 class="modal-title" data-i18n="dashboard.modalTitle">Configurar Marcador</h2>
+                
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div>
+                        <label class="form-label" data-i18n="dashboard.name">Nombre</label>
+                        <input type="text" name="title" id="form-title" class="form-input" data-i18n-placeholder="dashboard.namePlaceholder" placeholder="Ej: Plex" required autocomplete="off">
+                    </div>
+                    
+                    <div>
+                        <label class="form-label" data-i18n="dashboard.url">URL</label>
+                        <input type="url" name="url" id="form-url" class="form-input" data-i18n-placeholder="dashboard.urlPlaceholder" placeholder="https://..." required autocomplete="off">
+                    </div>
+                    
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <label class="form-label" style="margin: 0;" data-i18n="dashboard.icon">Icono</label>
+                            <span class="badge-online">
+                                <span style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%; display: inline-block;"></span>
+                                <span data-i18n="dashboard.online">Online</span>
+                            </span>
+                        </div>
+                        <input type="text" id="icon-search" class="form-input" autocomplete="off" data-i18n-placeholder="dashboard.searchIcon" placeholder="Buscar icono...">
+                        <div class="icon-list-grid" id="icon-results"></div>
+                        <input type="hidden" name="icon" id="form-icon-val" required>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <button type="submit" class="btn-primary" data-i18n="dashboard.save">Guardar Cambios</button>
+                    <button type="button" onclick="closeModal('modal')" class="btn-secondary" data-i18n="dashboard.cancel">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal confirmación eliminar -->
+    <div id="confirm-modal" class="hidden modal-overlay">
+        <div class="modal-box" style="text-align: center;">
+            <div class="confirm-icon">
+                <svg style="width: 32px; height: 32px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2"></path>
+                </svg>
+            </div>
+            <h3 class="confirm-title" data-i18n="dashboard.deleteTitle">¿Eliminar marcador?</h3>
+            <p class="confirm-text" id="delete-name"></p>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <button id="confirm-delete-btn" class="btn-primary" data-i18n="dashboard.confirm">Confirmar</button>
+                <button type="button" onclick="closeModal('confirm-modal')" class="btn-secondary" data-i18n="dashboard.cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isEditing = false;
+        let iconDatabase = [];
+        let sortableInstance;
+        let pendingDeleteId = null;
+
+        // Aplicar tema guardado sin botón en dashboard
+        (function applySavedTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+        })();
+
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(() => window.location.href = '/login')
+                .catch(() => window.location.href = '/login');
+        }
+
+        function toggleUserMenu() {
+            const menu = document.getElementById('user-menu');
+            menu.classList.toggle('open');
+            // Cerrar menú de añadir si está abierto
+            const addMenu = document.getElementById('add-dropdown-menu');
+            if (addMenu) addMenu.classList.remove('open');
+        }
+
+        function toggleAddMenu() {
+            const menu = document.getElementById('add-dropdown-menu');
+            menu.classList.toggle('open');
+            // Cerrar menú de usuario si está abierto
+            document.getElementById('user-menu').classList.remove('open');
+        }
+
+        // Cerrar menús al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('user-menu');
+            const addMenu = document.getElementById('add-dropdown-menu');
+            const clickedAvatar = event.target.closest('.user-avatar, .user-avatar-placeholder');
+            const clickedAddBtn = event.target.closest('#add-dropdown-btn');
+            
+            if (userMenu && !userMenu.contains(event.target) && !clickedAvatar) {
+                userMenu.classList.remove('open');
+            }
+            
+            if (addMenu && !addMenu.contains(event.target) && !clickedAddBtn) {
+                addMenu.classList.remove('open');
+            }
+        });
+
+        // Sortable
+        const grid = document.getElementById('main-grid');
+        sortableInstance = new Sortable(grid, {
+            animation: 250,
+            disabled: true,
+            onEnd: async function() {
+                const ids = Array.from(grid.querySelectorAll('.card')).map(card => card.dataset.id);
+                await fetch('/reorder-bookmarks', {
+                    method: 'POST',
+                    body: 'ids=' + ids.join(','),
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                });
+            }
+        });
+
+        function toggleEditMode() {
+            isEditing = !isEditing;
+            document.body.classList.toggle('editing', isEditing);
+            
+            document.getElementById('pencil-icon').style.display = isEditing ? 'none' : 'block';
+            document.getElementById('pencil-slash-icon').style.display = isEditing ? 'block' : 'none';
+            
+            const addContainer = document.querySelector('.add-dropdown-container');
+            if (addContainer) {
+                addContainer.style.display = isEditing ? 'block' : 'none';
+            }
+            
+            document.getElementById('user-menu').classList.remove('open');
+            const addMenu = document.getElementById('add-dropdown-menu');
+            if (addMenu) addMenu.classList.remove('open');
+            
+            sortableInstance.option('disabled', !isEditing);
+        }
+
+        function confirmDelete(id, name) {
+            pendingDeleteId = id;
+            const deleteMsg = window.i18n ? window.i18n.translate('dashboard.deleteMessage') : 'Estás a punto de borrar';
+            document.getElementById('delete-name').textContent = `${deleteMsg} "${name}".`;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        document.getElementById('confirm-delete-btn').onclick = async () => {
+            if (!pendingDeleteId) return;
+            await fetch('/delete-bookmark', {
+                method: 'POST',
+                body: 'id=' + pendingDeleteId,
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            });
+            document.getElementById('card-' + pendingDeleteId).remove();
+            closeModal('confirm-modal');
+            pendingDeleteId = null;
+        };
+
+        // Cargar iconos solo cuando sea necesario
+        let iconsLoaded = false;
+        function loadIcons() {
+            if (iconsLoaded) return;
+            iconsLoaded = true;
+            
+            fetch('https://raw.githubusercontent.com/selfhst/icons/main/index.json', { 
+                signal: AbortSignal.timeout(5000) 
+            })
+                .then(res => res.json())
+                .then(data => { iconDatabase = Object.values(data); })
+                .catch(err => {
+                    console.warn('No se pudieron cargar los iconos:', err);
+                    iconDatabase = [];
+                });
+        }
+
+        document.getElementById('icon-search').addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            const res = document.getElementById('icon-results');
+            res.innerHTML = '';
+            if (q.length < 1) return;
+            
+            iconDatabase
+                .filter(i => (i.Name || "").toLowerCase().includes(q) || (i.Reference || "").toLowerCase().includes(q))
+                .slice(0, 15)
+                .forEach(i => {
+                    const name = i.Reference || i.Name;
+                    const div = document.createElement('div');
+                    div.className = 'icon-opt';
+                    div.innerHTML = `<img src="https://raw.githubusercontent.com/selfhst/icons/main/webp/${name}.webp" style="width: 32px; height: 32px; object-fit: contain;">`;
+                    div.onclick = () => {
+                        document.getElementById('form-icon-val').value = name;
+                        document.getElementById('icon-search').value = name;
+                    };
+                    res.appendChild(div);
+                });
+        });
+
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const action = form.dataset.action;
+            const isEdit = action.includes('edit');
+            
+            try {
+                const response = await fetch(action, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(formData)
+                });
+                
+                if (response.ok) {
+                    if (isEdit) {
+                        const id = formData.get('id');
+                        const title = formData.get('title');
+                        const url = formData.get('url');
+                        const icon = formData.get('icon');
+                        
+                        const card = document.getElementById('card-' + id);
+                        if (card) {
+                            card.setAttribute('data-title', title);
+                            card.setAttribute('data-url', url);
+                            card.setAttribute('data-icon', icon);
+                            card.onclick = function() { if (!isEditing) window.open(url, '_blank'); };
+                            
+                            const img = card.querySelector('img');
+                            if (img && icon) {
+                                img.src = `https://raw.githubusercontent.com/selfhst/icons/main/webp/${icon}.webp`;
+                            }
+                            
+                            const span = card.querySelector('.card-title');
+                            if (span) {
+                                span.textContent = title;
+                            }
+                            
+                            const editBtn = card.querySelector('.edit-item-btn');
+                            if (editBtn) {
+                                editBtn.onclick = function(e) {
+                                    e.stopPropagation();
+                                    openModal('edit', { id, title, url, icon });
+                                };
+                            }
+                        }
+                    } else {
+                        window.location.href = '/dashboard';
+                    }
+                    closeModal('modal');
+                } else {
+                    alert('Error al guardar el marcador');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al guardar el marcador');
+            }
+        }
+
+        function openModal(mode, data = null) {
+            const form = document.getElementById('modal-form');
+            form.reset();
+            document.getElementById('icon-results').innerHTML = '';
+            
+            // Cargar iconos al abrir el modal
+            loadIcons();
+            
+            if (mode === 'edit') {
+                form.dataset.action = "/edit-bookmark";
+                document.getElementById('form-id').value = data.id;
+                document.getElementById('form-title').value = data.title;
+                document.getElementById('form-url').value = data.url;
+                document.getElementById('form-icon-val').value = data.icon;
+                document.getElementById('icon-search').value = data.icon;
+            } else {
+                form.dataset.action = "/add-bookmark";
+            }
+            
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function filterDashboard(query) {
+            const cards = document.querySelectorAll('.card');
+            const searchTerm = query.toLowerCase().trim();
+            
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title').toLowerCase();
+                const url = card.getAttribute('data-url').toLowerCase();
+                
+                if (title.includes(searchTerm) || url.includes(searchTerm)) {
+                    card.classList.remove('hidden-card');
+                } else {
+                    card.classList.add('hidden-card');
+                }
+            });
+        }
+
+        // i18n Dashboard Translation - FUNCIÓN COMPLETA
+        function translateDashboard() {
+            if (!window.i18n) return;
+            
+            try {
+                // Traducir elementos con data-i18n
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    const translation = window.i18n.translate(key);
+                    if (translation) {
+                        el.textContent = translation;
+                    }
+                });
+
+                // Traducir placeholders con data-i18n-placeholder
+                document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-i18n-placeholder');
+                    const translation = window.i18n.translate(key);
+                    if (translation) {
+                        el.placeholder = translation;
+                    }
+                });
+            } catch (e) {
+                console.warn('Error en traducción de dashboard:', e);
+            }
+        }
+
+        // Modal de actualización
+        function openUpdateModal() {
+            const modal = document.getElementById('update-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeUpdateModal() {
+            const modal = document.getElementById('update-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('update-modal');
+            if (modal && event.target === modal) {
+                closeUpdateModal();
+            }
+        });
+
+        // Verificar actualizaciones al cargar
+        function checkUpdatesOnLoad() {
+            fetch('/check-updates')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.update_available) {
+                        document.getElementById('update-badge').style.display = 'block';
+                        document.getElementById('update-menu-item').style.display = 'flex';
+                        // Guardar información en sessionStorage para el modal
+                        sessionStorage.setItem('updateInfo', JSON.stringify(data));
+                    }
+                })
+                .catch(err => console.warn('Error checking updates:', err));
+        }
+
+        // Initialize i18n on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const userLanguage = '{{.User.Language}}' || 'en';
+            
+            // Esperar un momento para asegurar que i18n.js termine su carga inicial
+            const initTranslations = () => {
+                if (window.i18n && window.i18n.currentLanguage) {
+                    // Si el idioma del usuario es diferente al ya cargado, cambiar
+                    if (window.i18n.currentLanguage !== userLanguage) {
+                        window.i18n.loadLanguage(userLanguage).then(() => {
+                            translateDashboard();
+                            window.i18n.persistLanguage(userLanguage);
+                        }).catch(err => {
+                            console.warn('Error loading language:', err);
+                        });
+                    } else {
+                        // Ya está en el idioma correcto, solo traducir
+                        translateDashboard();
+                    }
+                } else {
+                    // i18n no está listo, intentar de nuevo
+                    setTimeout(initTranslations, 50);
+                }
+            };
+            
+            initTranslations();
+            
+            // Verificar actualizaciones
+            checkUpdatesOnLoad();
+        });
+    </script>
+</body>
+</html>

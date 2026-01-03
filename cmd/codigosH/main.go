@@ -43,7 +43,7 @@ func main() {
 
 	// Archivos estáticos (públicos)
 	fs := http.FileServer(http.Dir("web/static"))
-	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+	mux.Handle("/static/", http.StripPrefix("/static/", middleware.LogStaticFiles(fs)))
 
 	// Rutas públicas
 	mux.HandleFunc("/login", h.HandleLogin)

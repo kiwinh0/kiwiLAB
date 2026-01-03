@@ -947,6 +947,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('[Setup] Iniciando wizard setup');
+            console.log('[Setup] window.i18n disponible:', typeof window.i18n !== 'undefined');
+            
             let currentStep = 1;
             const totalSteps = 5;
             const languageLabels = {
@@ -978,12 +981,16 @@
             // Esperar a que i18n esté disponible y cargar idioma inicial
             function initializeLanguage() {
                 if (window.i18n && typeof window.i18n.loadLanguage === 'function') {
+                    console.log('[i18n] Cargando idioma inicial:', initialLanguage);
                     window.i18n.loadLanguage(initialLanguage).then(() => {
+                        console.log('[i18n] Idioma cargado correctamente');
                         window.i18n.updatePageLanguage();
-                    }).catch(() => {
+                    }).catch((error) => {
+                        console.error('[i18n] Error cargando idioma:', error);
                         window.i18n.updatePageLanguage();
                     });
                 } else {
+                    console.warn('[i18n] window.i18n no disponible, reintentando...');
                     setTimeout(initializeLanguage, 100);
                 }
             }
@@ -1037,11 +1044,16 @@
                         
                         // Cambiar idioma en i18n y actualizar página
                         if (window.i18n && typeof window.i18n.loadLanguage === 'function') {
+                            console.log('[i18n] Cambiando idioma a:', lang);
                             window.i18n.loadLanguage(lang).then(() => {
+                                console.log('[i18n] Idioma cambiado correctamente a:', lang);
                                 window.i18n.updatePageLanguage();
-                            }).catch(() => {
+                            }).catch((error) => {
+                                console.error('[i18n] Error cambiando idioma:', error);
                                 window.i18n.updatePageLanguage();
                             });
+                        } else {
+                            console.error('[i18n] window.i18n no está disponible');
                         }
                     });
                 });

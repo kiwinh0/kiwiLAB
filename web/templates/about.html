@@ -1,7 +1,58 @@
 <!DOCTYPE html>
 <html lang="{{.User.Language}}" class="dark">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodigoSH | Acerca de</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/static/i18n/i18n.js"></script>
     <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            33% { transform: translateY(-30px) translateX(20px); }
+            66% { transform: translateY(20px) translateX(-20px); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        html.dark body { 
+            background: #0a0a0a; 
+            color: #ffffff;
+        }
+        
+        html:not(.dark) body { 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); 
+            color: #0f172a; 
+        }
+
         /* Gradientes de fondo */
         .gradient-bg {
             position: fixed;
@@ -364,7 +415,7 @@
             <!-- Footer -->
             <div class="footer">
                 <p class="developed" data-i18n="about.developed_with">Desarrollado con ❤️ usando Go y modern web technologies</p>
-                <p class="copyright" data-i18n="about.copyright">© 2026 CodigoSH. Todos los derechos reservados.</p>
+                <p class="copyright" data-i18n="about.copyright">© 2026 CodigoSH - Licencia MIT</p>
                 <p class="license-note" data-i18n="about.license_note" style="font-size: 0.8rem; color: #64748b; margin-top: 0.5rem;">Libre de usar, modificar y distribuir.</p>
                 <a href="https://github.com/kiwinh0/CodigoSH" target="_blank" class="github-link" data-i18n="about.view_on_github">
                     <svg class="github-icon" fill="currentColor" viewBox="0 0 24 24">
@@ -377,7 +428,7 @@
     </div>
 
     <script>
-        // Traduce elementos clave con data-i18n
+        // Función para traducir elementos con data-i18n
         function translateAboutPage() {
             const setText = (selector, key, fallback) => {
                 const el = document.querySelector(selector);
@@ -396,7 +447,7 @@
 
             setText('.description', 'about.description', document.querySelector('.description')?.textContent.trim());
             setText('.developed', 'about.developed_with', 'Desarrollado con ❤️ usando Go y modern web technologies');
-            setText('.copyright', 'about.copyright', '© 2026 CodigoSH. Todos los derechos reservados.');
+            setText('.copyright', 'about.copyright', '© 2026 CodigoSH - Licencia MIT');
             setText('.license-note', 'about.license_note', 'Libre de usar, modificar y distribuir.');
 
             const githubLink = document.querySelector('.github-link');
@@ -418,24 +469,10 @@
         // Inicializar i18n cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', function() {
             const userLanguage = document.documentElement.lang || 'es';
-            if (window.i18n && window.i18n.loadLanguage) {
-                i18n.loadLanguage(userLanguage).then(() => {
-                    translateAboutPage();
-                    localStorage.setItem('currentLanguage', userLanguage);
-                }).catch(err => {
-                    console.warn('Error loading language:', err);
-                    translateAboutPage();
-                });
-            } else {
-                // i18n no disponible, intentar más tarde
-                setTimeout(() => {
-                    if (window.i18n && window.i18n.loadLanguage) {
-                        i18n.loadLanguage(userLanguage).then(() => {
-                            translateAboutPage();
-                        });
-                    }
-                }, 100);
-            }
+            i18n.loadLanguage(userLanguage).then(() => {
+                translateAboutPage();
+                localStorage.setItem('currentLanguage', userLanguage);
+            });
         });
     </script>
 </body>

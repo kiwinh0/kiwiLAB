@@ -141,6 +141,7 @@
 
         /* Card principal */
         .about-card {
+            position: relative;
             background: rgba(15, 15, 17, 0.8);
             backdrop-filter: blur(40px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -161,6 +162,52 @@
                 0 0 0 1px rgba(0, 0, 0, 0.03),
                 0 50px 100px -20px rgba(0, 0, 0, 0.15),
                 0 30px 60px -30px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Botón de verificación de updates */
+        .top-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 0.75rem;
+        }
+
+        .update-check-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9));
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.35);
+        }
+
+        .update-check-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 38px rgba(239, 68, 68, 0.4);
+        }
+
+        .update-check-btn:active {
+            transform: translateY(0);
+        }
+
+        .update-available {
+            text-align: center;
+            font-weight: 800;
+            color: #22c55e;
+            margin-top: -1rem;
+            margin-bottom: 1.5rem;
+            animation: blink 1s infinite ease-in-out;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; }
         }
 
         /* Logo */
@@ -395,6 +442,11 @@
     <!-- Contenido principal -->
     <div class="about-container">
         <div class="about-card">
+                <div class="top-actions">
+                    <button class="update-check-btn" id="forceUpdateCheck">
+                        🔄 Comprobar actualizaciones
+                    </button>
+                </div>
             <!-- Logo -->
             <div style="text-align: center;">
                 <div class="logo-wrapper">
@@ -405,6 +457,7 @@
             <!-- Título y versión -->
             <h1 class="brand-name">CodigoSH</h1>
             <div class="version" data-version="{{.Version}}"></div>
+            <div class="update-available" id="updateAvailableBanner" style="display: none;"></div>
 
             <!-- Descripción -->
             <p class="description" data-i18n="about.description">
@@ -458,6 +511,41 @@
                 if (icon) githubLink.appendChild(icon);
                 githubLink.appendChild(document.createTextNode(' ' + translated));
             }
+
+            const updateBtn = document.getElementById('forceUpdateCheck');
+            if (updateBtn) {
+                const txt = i18n.translate('about.check_updates') || 'Comprobar actualizaciones';
+                updateBtn.textContent = `🔄 ${txt}`;
+            }
+        }
+
+        async function checkUpdates(force = false) {
+            const banner = document.getElementById('updateAvailableBanner');
+            const btn = document.getElementById('forceUpdateCheck');
+            if (btn) {
+                btn.disabled = true;
+                btn.style.opacity = '0.7';
+            }
+            try {
+                const url = force ? '/check-updates?force=true' : '/check-updates';
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                const data = await res.json();
+                if (data && data.update_available) {
+                    const avail = data.available_version || 'nueva versión';
+                    banner.style.display = 'block';
+                    banner.textContent = `Nueva versión ${avail} disponible`;
+                } else {
+                    banner.style.display = 'none';
+                    banner.textContent = '';
+                }
+            } catch (err) {
+                console.warn('Error comprobando actualizaciones', err);
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                }
+            }
         }
 
         // Aplicar tema guardado (solo lectura, sin toggle)
@@ -471,8 +559,14 @@
             const userLanguage = document.documentElement.lang || 'es';
             i18n.loadLanguage(userLanguage).then(() => {
                 translateAboutPage();
+                checkUpdates(false);
                 localStorage.setItem('currentLanguage', userLanguage);
             });
+
+            const updateBtn = document.getElementById('forceUpdateCheck');
+            if (updateBtn) {
+                updateBtn.addEventListener('click', () => checkUpdates(true));
+            }
         });
     </script>
 </body>

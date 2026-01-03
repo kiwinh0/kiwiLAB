@@ -275,10 +275,6 @@ log "Instalando nuevo binario..."
 cp codigosH "` + currentExecutable + `"
 chmod +x "` + currentExecutable + `"
 
-log "Deteniendo proceso anterior..."
-pkill -f "` + currentExecutable + `" || true
-sleep 1
-
 log "Verificando instalación del binario..."
 if [ ! -f "` + currentExecutable + `" ]; then
     log "ERROR: El binario no se instaló correctamente"
@@ -290,14 +286,7 @@ cd /tmp
 rm -rf ` + tmpDir + `
 rm -f ` + updateScript + `
 
-log "Iniciando nuevo proceso..."
-systemctl restart codigosH 2>/dev/null || {
-    log "Intentando reiniciar con método alternativo..."
-    nohup "` + currentExecutable + `" > /tmp/codigosh.log 2>&1 &
-    true
-}
-
-log "Actualización completada exitosamente"
+log "Actualización completada. Se debe reiniciar el servicio para tomar la nueva versión"
 `
 
 	if err := os.WriteFile(updateScript, []byte(scriptContent), 0755); err != nil {
@@ -309,7 +298,7 @@ log "Actualización completada exitosamente"
 		return
 	}
 
-	// Ejecutar el script en background
+	// Ejecutar el script y esperar a que termine (compila y reemplaza binario)
 	cmd := exec.Command("bash", updateScript)
 	if err := cmd.Run(); err != nil {
 		logrus.WithError(err).Error("Error en la actualización")
@@ -320,7 +309,17 @@ log "Actualización completada exitosamente"
 		return
 	}
 
-	logrus.Info("Actualización completada exitosamente")
+	// Lanzar reinicio del servicio en segundo plano para evitar cortar la respuesta
+	go func() {
+		time.Sleep(2 * time.Second)
+		if err := exec.Command("systemctl", "restart", "codigosH").Run(); err != nil {
+			logrus.WithError(err).Warn("No se pudo reiniciar con systemctl, intentando fallback")
+			// Fallback: iniciar binario directamente
+			_ = exec.Command("nohup", currentExecutable).Start()
+		}
+	}()
+
+	logrus.Info("Actualización completada, reinicio programado")
 
 	// Invalidar caché para próxima verificación
 	InvalidateUpdateCache()

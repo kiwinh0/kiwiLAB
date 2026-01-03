@@ -236,14 +236,17 @@ func (h *Handler) HandlePerformUpdate(w http.ResponseWriter, r *http.Request) {
 	// Crear script de actualización que se ejecutará de forma independiente
 	updateScript := "/tmp/update_codigosh.sh"
 	releaseVersion := "v" + updateInfo.AvailableVersion
-	
+
 	scriptContent := `#!/bin/bash
 set -e
 
 # Función para logging
 log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> /tmp/codigosh_update.log
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" | tee -a /tmp/codigosh_update.log
 }
+
+# Redirigir todo el output al log
+exec 2>&1 | tee -a /tmp/codigosh_update.log
 
 log "=== Iniciando actualización de CodigoSH a ` + releaseVersion + ` ==="
 
@@ -298,15 +301,14 @@ fi
 
 log "Binario instalado correctamente"
 
-# Limpiar
+# Limpiar archivos temporales (pero NO el script aún)
 log "Limpiando archivos temporales..."
 cd /tmp
 rm -rf "$TEMP_DIR"
-rm -f /tmp/update_codigosh.sh
 
 log "=== Actualización completada exitosamente ==="
-log "Esperando 2 segundos antes de reiniciar el servicio..."
-sleep 2
+log "Esperando 3 segundos antes de reiniciar el servicio..."
+sleep 3
 
 # Reiniciar servicio
 log "Reiniciando servicio..."
@@ -315,13 +317,19 @@ if systemctl restart codigosH 2>/dev/null; then
 elif service codigosH restart 2>/dev/null; then
     log "Servicio reiniciado con service"
 else
-    log "WARN: No se pudo reiniciar automáticamente. Reiniciar manualmente."
-    # Intentar reiniciar el binario directamente
+    log "WARN: No se pudo reiniciar automáticamente. Intentando fallback..."
+    # Matar proceso actual y reiniciar
+    pkill -f codigosH || true
+    sleep 1
     nohup "$BINARY_PATH" > /dev/null 2>&1 &
     log "Binario reiniciado directamente (PID: $!)"
 fi
 
+sleep 1
 log "=== Proceso de actualización finalizado ==="
+
+# Eliminar el script al final
+rm -f /tmp/update_codigosh.sh
 `
 
 	if err := os.WriteFile(updateScript, []byte(scriptContent), 0755); err != nil {
@@ -333,9 +341,12 @@ log "=== Proceso de actualización finalizado ==="
 		return
 	}
 
-	// Ejecutar el script en segundo plano de forma inmediata
-	// No esperamos a que termine para no bloquear la respuesta
-	cmd := exec.Command("bash", updateScript)
+	// Ejecutar el script en segundo plano usando nohup para que sobreviva
+	// Usamos nohup + bash para que el script se ejecute completamente incluso después de que el servidor se cierre
+	cmd := exec.Command("nohup", "bash", updateScript)
+	cmd.Stdout = nil
+	cmd.Stderr = nil
+
 	if err := cmd.Start(); err != nil {
 		logrus.WithError(err).Error("Error iniciando script de actualización")
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -345,7 +356,12 @@ log "=== Proceso de actualización finalizado ==="
 		return
 	}
 
-	logrus.Info("Script de actualización iniciado en segundo plano")
+	// Liberar el proceso para que se ejecute independientemente
+	go func() {
+		cmd.Wait()
+	}()
+
+	logrus.Info("Script de actualización iniciado en segundo plano con nohup")
 
 	// Invalidar caché para próxima verificación
 	InvalidateUpdateCache()

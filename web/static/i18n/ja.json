@@ -99,6 +99,7 @@
     "addSection": "セクションを追加",
     "updateAvailable": "更新",
     "updateTitle": "更新",
+    "currentVersion": "現在のバージョン：",
     "newVersion": "新しいバージョン：",
     "releaseDate": "リリース日：",
     "mainChanges": "主な変更：",

@@ -99,6 +99,7 @@
     "addSection": "Ajouter une section",
     "updateAvailable": "Mise à jour",
     "updateTitle": "Mise à jour",
+    "currentVersion": "Version actuelle :",
     "newVersion": "Nouvelle version :",
     "releaseDate": "Date de sortie :",
     "mainChanges": "Principaux changements :",

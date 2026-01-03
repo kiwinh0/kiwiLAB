@@ -99,6 +99,7 @@
     "addSection": "เพิ่มส่วน",
     "updateAvailable": "อัปเดต",
     "updateTitle": "อัปเดต",
+    "currentVersion": "เวอร์ชันปัจจุบัน:",
     "newVersion": "เวอร์ชันใหม่:",
     "releaseDate": "วันที่ปล่อยตัว:",
     "mainChanges": "การเปลี่ยนแปลงหลัก:",

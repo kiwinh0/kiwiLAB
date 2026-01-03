@@ -96,6 +96,7 @@
     "addSection": "Add section",
     "updateAvailable": "Update",
     "updateTitle": "Update",
+    "currentVersion": "Current version:",
     "newVersion": "New version:",
     "releaseDate": "Release date:",
     "mainChanges": "Main changes:",

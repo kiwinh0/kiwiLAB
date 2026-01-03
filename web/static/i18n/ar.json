@@ -98,8 +98,7 @@
     "cerrar_sesion": "تسجيل الخروج",
     "addSection": "إضافة قسم",
     "updateAvailable": "تحديث",
-    "updateTitle": "تحديث",
-    "newVersion": "إصدار جديد:",
+    "updateTitle": "تحديث",    "currentVersion": "الإصدار الحالي:",    "newVersion": "إصدار جديد:",
     "releaseDate": "تاريخ الإصدار:",
     "mainChanges": "التغييرات الرئيسية:",
     "viewReleaseNotes": "عرض ملاحظات الإصدار",    "updateNow": "التحديث الآن",    "later": "لاحقا"

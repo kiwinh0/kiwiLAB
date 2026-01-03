@@ -1296,17 +1296,22 @@
                         languageDropdownMenu.classList.remove('open');
                         languageSelected.classList.remove('open');
                         
-                        // Load and persist the selected language immediately
+                        // Load and persist the selected language immediately for preview
                         if (window.i18n) {
                             window.i18n.loadLanguage(lang).then(() => {
                                 window.i18n.updatePageLanguage();
-                                // Translate settings page content
                                 translateSettingsPage();
                                 window.i18n.persistLanguage(lang);
+                                
+                                // Automatically submit the form to save to database
+                                // Find the parent form and submit it
+                                const form = languageInput.closest('form');
+                                if (form) {
+                                    console.log('[Settings] Auto-guardando idioma en BD:', lang);
+                                    form.submit();
+                                }
                             });
                         }
-                        
-                        localStorage.setItem('projectLanguage', lang);
                     });
                 });
 

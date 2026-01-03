@@ -275,14 +275,25 @@ log "Instalando nuevo binario..."
 cp codigosH "` + currentExecutable + `"
 chmod +x "` + currentExecutable + `"
 
+log "Deteniendo proceso anterior..."
+pkill -f "` + currentExecutable + `" || true
+sleep 1
+
+log "Verificando instalación del binario..."
+if [ ! -f "` + currentExecutable + `" ]; then
+    log "ERROR: El binario no se instaló correctamente"
+    exit 1
+fi
+
 log "Limpiando archivos temporales..."
 cd /tmp
 rm -rf ` + tmpDir + `
 rm -f ` + updateScript + `
 
-log "Reiniciando servicio codigosH..."
+log "Iniciando nuevo proceso..."
 systemctl restart codigosH 2>/dev/null || {
-    log "Nota: No se pudo reiniciar servicio systemd (posiblemente ejecutable local)"
+    log "Intentando reiniciar con método alternativo..."
+    nohup "` + currentExecutable + `" > /tmp/codigosh.log 2>&1 &
     true
 }
 
@@ -300,19 +311,22 @@ log "Actualización completada exitosamente"
 
 	// Ejecutar el script en background
 	cmd := exec.Command("bash", updateScript)
-	if err := cmd.Start(); err != nil {
-		logrus.WithError(err).Error("Error iniciando actualización")
+	if err := cmd.Run(); err != nil {
+		logrus.WithError(err).Error("Error en la actualización")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success": false,
-			"message": "Error iniciando la actualización",
+			"message": "Error durante la actualización",
 		})
 		return
 	}
 
-	logrus.Info("Actualización iniciada correctamente - compilando desde fuente")
+	logrus.Info("Actualización completada exitosamente")
+
+	// Invalidar caché para próxima verificación
+	InvalidateUpdateCache()
 
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
-		"message": "Actualización iniciada. Compilando desde código fuente. El servicio se reiniciará automáticamente.",
+		"message": "Actualización completada. La página se recargará con la nueva versión.",
 	})
 }

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"os"
+	"os/exec"
 	"strings"
 	"sync"
 	"time"
@@ -136,4 +138,118 @@ func (h *Handler) HandleCheckUpdates(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(info)
+}
+
+// HandlePerformUpdate descarga e instala la última versión
+func (h *Handler) HandlePerformUpdate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	// Verificar que hay una actualización disponible
+	updateInfo := CheckForUpdates()
+	if !updateInfo.UpdateAvailable {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "No hay actualizaciones disponibles",
+		})
+		return
+	}
+
+	logrus.Info("Iniciando descarga de actualización...")
+
+	// Descargar el binario desde GitHub releases
+	releaseURL := "https://github.com/kiwinh0/CodigoSH/releases/download/v" + updateInfo.AvailableVersion + "/codigosH"
+	
+	resp, err := http.Get(releaseURL)
+	if err != nil {
+		logrus.WithError(err).Error("Error descargando actualización")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "Error descargando la actualización",
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		logrus.Warnf("GitHub retornó status %d", resp.StatusCode)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "Binario no disponible para descargar",
+		})
+		return
+	}
+
+	// Leer el binario descargado
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		logrus.WithError(err).Error("Error leyendo descarga")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "Error procesando la descarga",
+		})
+		return
+	}
+
+	// Guardar en archivo temporal
+	tmpFile := "/tmp/codigosH.new"
+	if err := os.WriteFile(tmpFile, body, 0755); err != nil {
+		logrus.WithError(err).Error("Error escribiendo binario temporal")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "Error guardando archivo",
+		})
+		return
+	}
+
+	// Obtener ruta actual del ejecutable
+	currentExecutable, err := os.Executable()
+	if err != nil {
+		logrus.WithError(err).Error("Error obteniendo ruta ejecutable")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "Error en la actualización",
+		})
+		return
+	}
+
+	// Crear script de actualización que se ejecute después
+	updateScript := `/tmp/update_codigosh.sh`
+	scriptContent := `#!/bin/bash
+sleep 1
+cp "` + tmpFile + `" "` + currentExecutable + `"
+rm "` + tmpFile + `"
+systemctl restart codigosH 2>/dev/null || true
+`
+
+	if err := os.WriteFile(updateScript, []byte(scriptContent), 0755); err != nil {
+		logrus.WithError(err).Error("Error creando script de actualización")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "Error en la actualización",
+		})
+		return
+	}
+
+	// Ejecutar el script en background
+	cmd := exec.Command("bash", updateScript)
+	if err := cmd.Start(); err != nil {
+		logrus.WithError(err).Error("Error iniciando actualización")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "Error iniciando la actualización",
+		})
+		return
+	}
+
+	logrus.Info("Actualización iniciada correctamente")
+	
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": "Actualización iniciada. El servicio se reiniciará automáticamente.",
+	})
 }

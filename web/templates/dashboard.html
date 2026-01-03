@@ -942,9 +942,16 @@
             </div>
 
             <div id="update-content" style="display: flex; flex-direction: column; gap: 1rem;">
-                <div>
-                    <p style="font-size: 0.875rem; opacity: 0.7; margin-bottom: 0.25rem;" data-i18n="dashboard.newVersion">Nueva versión:</p>
-                    <p id="update-version" style="font-size: 1.25rem; font-weight: 600; color: #ef4444;"></p>
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="flex: 1;">
+                        <p style="font-size: 0.875rem; opacity: 0.7; margin-bottom: 0.25rem;">Versión actual:</p>
+                        <p id="current-version" style="font-size: 0.9375rem; font-weight: 500;"></p>
+                    </div>
+                    <div style="font-size: 1.25rem; opacity: 0.5;">→</div>
+                    <div style="flex: 1;">
+                        <p style="font-size: 0.875rem; opacity: 0.7; margin-bottom: 0.25rem;">Nueva versión:</p>
+                        <p id="update-version" style="font-size: 1.125rem; font-weight: 600; color: #ef4444;"></p>
+                    </div>
                 </div>
 
                 <div>
@@ -954,18 +961,21 @@
 
                 <div>
                     <p style="font-size: 0.875rem; opacity: 0.7; margin-bottom: 0.5rem;" data-i18n="dashboard.mainChanges">Principales cambios:</p>
-                    <ul id="update-changes" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <ul id="update-changes" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; margin: 0;">
                     </ul>
                 </div>
 
                 <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
-                    <a href="https://github.com/kiwinh0/CodigoSH/releases/latest" target="_blank" style="flex: 1; padding: 0.75rem 1rem; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; text-align: center; text-decoration: none; font-weight: 500; transition: all 0.3s ease;">
-                        <span data-i18n="dashboard.viewReleaseNotes">Ver notas de lanzamiento</span>
-                    </a>
+                    <button id="update-btn" onclick="performUpdate()" style="flex: 1; padding: 0.75rem 1rem; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">
+                        <span data-i18n="dashboard.updateNow">Actualizar ahora</span>
+                    </button>
                     <button onclick="closeUpdateModal()" style="flex: 1; padding: 0.75rem 1rem; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1.5px solid rgba(239, 68, 68, 0.3); border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">
                         <span data-i18n="dashboard.later">Más tarde</span>
                     </button>
                 </div>
+                <p style="font-size: 0.8125rem; opacity: 0.6; text-align: center; margin: 0;">
+                    <a href="https://github.com/kiwinh0/CodigoSH/releases/latest" target="_blank" style="color: inherit; text-decoration: underline; opacity: 0.8;">Ver notas completas de lanzamiento</a>
+                </p>
             </div>
         </div>
     </div>
@@ -1336,6 +1346,30 @@
         // Modal de actualización
         function openUpdateModal() {
             const modal = document.getElementById('update-modal');
+            const updateInfo = JSON.parse(sessionStorage.getItem('updateInfo') || '{}');
+            
+            if (updateInfo.available_version) {
+                // Llenar información del modal
+                document.getElementById('current-version').textContent = '{{.Version}}';
+                document.getElementById('update-version').textContent = 'v' + updateInfo.available_version;
+                
+                if (updateInfo.release_date) {
+                    const date = new Date(updateInfo.release_date).toLocaleDateString();
+                    document.getElementById('update-date').textContent = date;
+                }
+                
+                const changesList = document.getElementById('update-changes');
+                changesList.innerHTML = '';
+                if (updateInfo.changes && updateInfo.changes.length > 0) {
+                    updateInfo.changes.forEach(change => {
+                        const li = document.createElement('li');
+                        li.style.cssText = 'display: flex; gap: 0.5rem;';
+                        li.innerHTML = `<span style="color: #ef4444; flex-shrink: 0;">•</span><span>${change}</span>`;
+                        changesList.appendChild(li);
+                    });
+                }
+            }
+            
             if (modal) {
                 modal.classList.remove('hidden');
             }
@@ -1346,6 +1380,35 @@
             if (modal) {
                 modal.classList.add('hidden');
             }
+        }
+
+        function performUpdate() {
+            const updateBtn = document.getElementById('update-btn');
+            const originalText = updateBtn.querySelector('span').textContent;
+            
+            updateBtn.disabled = true;
+            updateBtn.style.opacity = '0.6';
+            updateBtn.querySelector('span').textContent = 'Actualizando...';
+            
+            fetch('/perform-update', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        updateBtn.querySelector('span').textContent = '✓ Actualizado correctamente';
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        throw new Error(data.message || 'Error en la actualización');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    updateBtn.disabled = false;
+                    updateBtn.style.opacity = '1';
+                    updateBtn.querySelector('span').textContent = originalText;
+                    alert('Error al actualizar: ' + err.message);
+                });
         }
 
         // Cerrar modal al hacer clic fuera

@@ -74,6 +74,7 @@ func main() {
 	mux.Handle("/export-data", authHandler(loggedHandler(http.HandlerFunc(h.HandleExportData))))
 	mux.Handle("/import-data", authHandler(loggedHandler(http.HandlerFunc(h.HandleImportData))))
 	mux.Handle("/check-updates", authHandler(loggedHandler(http.HandlerFunc(h.HandleCheckUpdates))))
+	mux.Handle("/perform-update", authHandler(loggedHandler(http.HandlerFunc(h.HandlePerformUpdate))))
 
 	// Ruta raíz "/" debe ir AL FINAL como catch-all
 	mux.HandleFunc("/", h.HandleRoot)

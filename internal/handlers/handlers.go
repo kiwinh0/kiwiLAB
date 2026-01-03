@@ -174,9 +174,11 @@ func (h *Handler) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Bookmarks []models.Bookmark
 		User      models.User
+		Version   string
 	}{
 		Bookmarks: bms,
 		User:      user,
+		Version:   Version,
 	}
 
 	logrus.Info("Parsing dashboard template")

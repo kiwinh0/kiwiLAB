@@ -1,4 +1,4 @@
-# Binarios
+# Binarios compilados
 bin/
 codigosH
 kiwilab
@@ -13,17 +13,13 @@ main
 # Logs
 *.log
 
-# Archivos temporales y de prueba
+# Archivos temporales
 *.tmp
 *.swp
 .DS_Store
 cookies.txt
-test_*.go
-test_*.html
-test_*.sh
-simple_test.sh
 
-# Uploads
+# Uploads de usuarios
 web/static/uploads/*
 !web/static/uploads/.gitkeep
 
@@ -31,21 +27,16 @@ web/static/uploads/*
 .vscode/
 .idea/
 *.iml
+*.swp
+*~
 
-# Documentación temporal
-LXC-PROXMOX-HELP.md
+# OS
+.DS_Store
+Thumbs.db
 
-# Archivos de desarrollo/testing
-*.py
-complete_*.sh
-test_*.sh
-install.sh
-create_release.sh
-*_TRADUCCION.md
-ESTADO_FINAL_TRADUCCION.txt
-TRANSLATION_SYSTEM_COMPLETE.md
-final_verification.md
-DEMO_TRADUCCION.md
-INSTRUCCIONES_DE_USO.sh
-README_TRADUCCION.md
-ui/
+# Dependencias Go
+vendor/
+
+# Archivos de configuración local
+.env
+.env.local

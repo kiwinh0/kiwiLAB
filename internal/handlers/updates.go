@@ -163,7 +163,7 @@ func (h *Handler) HandlePerformUpdate(w http.ResponseWriter, r *http.Request) {
 
 	// Descargar el binario desde GitHub releases
 	releaseURL := "https://github.com/kiwinh0/CodigoSH/releases/download/v" + updateInfo.AvailableVersion + "/codigosH"
-	
+
 	resp, err := http.Get(releaseURL)
 	if err != nil {
 		logrus.WithError(err).Error("Error descargando actualización")
@@ -247,7 +247,7 @@ systemctl restart codigosH 2>/dev/null || true
 	}
 
 	logrus.Info("Actualización iniciada correctamente")
-	
+
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
 		"message": "Actualización iniciada. El servicio se reiniciará automáticamente.",

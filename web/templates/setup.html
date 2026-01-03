@@ -975,20 +975,19 @@
                 savedOption.classList.add('selected');
             }
             
-            // Esperar a que i18n esté disponible
-            function loadLanguageIfReady() {
-                if (window.i18n && window.i18n.loadLanguage) {
-                    window.i18n.currentLanguage = initialLanguage;
+            // Esperar a que i18n esté disponible y cargar idioma inicial
+            function initializeLanguage() {
+                if (window.i18n && typeof window.i18n.loadLanguage === 'function') {
                     window.i18n.loadLanguage(initialLanguage).then(() => {
                         window.i18n.updatePageLanguage();
-                        updateProgress();
+                    }).catch(() => {
+                        window.i18n.updatePageLanguage();
                     });
                 } else {
-                    // Reintentar en 100ms
-                    setTimeout(loadLanguageIfReady, 100);
+                    setTimeout(initializeLanguage, 100);
                 }
             }
-            loadLanguageIfReady();
+            initializeLanguage();
             
             if (dropdownSelected && dropdownMenu) {
                 dropdownSelected.addEventListener('click', function(e) {
@@ -1026,6 +1025,7 @@
                         const lang = this.dataset.lang;
                         const text = this.dataset.text;
                         
+                        // Actualizar UI
                         selectedLangText.textContent = text;
                         languageInput.value = lang;
                         
@@ -1035,29 +1035,13 @@
                         dropdownMenu.classList.remove('open');
                         dropdownSelected.classList.remove('open');
                         
-                        const i18nInstance = window.i18n || window.parent?.i18n || i18n;
-                        if (i18nInstance && i18nInstance.loadLanguage) {
-                            // Update language for UI only (don't persist yet)
-                            i18nInstance.currentLanguage = lang;
-                            i18nInstance.loadLanguage(lang).then(() => {
-                                i18nInstance.updatePageLanguage();
-                                updateProgress();
+                        // Cambiar idioma en i18n y actualizar página
+                        if (window.i18n && typeof window.i18n.loadLanguage === 'function') {
+                            window.i18n.loadLanguage(lang).then(() => {
+                                window.i18n.updatePageLanguage();
                             }).catch(() => {
-                                i18nInstance.updatePageLanguage();
-                                updateProgress();
+                                window.i18n.updatePageLanguage();
                             });
-                        } else {
-                            // Si i18n no está listo, reintentar
-                            setTimeout(() => {
-                                const i18nRetry = window.i18n;
-                                if (i18nRetry && i18nRetry.loadLanguage) {
-                                    i18nRetry.currentLanguage = lang;
-                                    i18nRetry.loadLanguage(lang).then(() => {
-                                        i18nRetry.updatePageLanguage();
-                                        updateProgress();
-                                    });
-                                }
-                            }, 100);
                         }
                     });
                 });

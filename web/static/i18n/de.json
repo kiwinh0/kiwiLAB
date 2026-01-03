@@ -103,7 +103,9 @@
     "newVersion": "Neue Version:",
     "releaseDate": "Veröffentlichungsdatum:",
     "mainChanges": "Hauptänderungen:",
-    "viewReleaseNotes": "Versionshinweise ansehen",    "updateNow": "Jetzt aktualisieren",    "later": "Später"
+    "viewReleaseNotes": "Versionshinweise ansehen",
+    "updateNow": "Jetzt aktualisieren",
+    "later": "Später"
   },
   "settings": {
     "title": "Einstellungen",
@@ -162,16 +164,16 @@
     "feature5": "Drag & Drop zum Neuordnen",
     "feature6": "Erweiterte Anpassung",
     "developed": "Entwickelt mit ❤️ unter Verwendung von Go und modernen Webtechnologien",
-    "copyright": "© 2026 CodigoSH. Alle Rechte vorbehalten.",
+    "copyright": "© 2026 CodigoSH.",
     "viewOnGitHub": "Auf GitHub ansehen",
     "titulo": "CodigoSH",
     "descripcion": "Eine moderne Webanwendung zur Verwaltung Ihrer Lesezeichen und Lieblingsbrowser. Organisieren, passen Sie an und greifen Sie schnell auf Ihre wichtigsten Ressourcen zu.",
     "caracteristicas_principales": "Hauptmerkmale",
     "desarrollado_con": "Entwickelt mit ❤️ mit Go und modernen Web-Technologien",
-    "derechos_reservados": "© 2026 CodigoSH. Alle Rechte vorbehalten.",
+    "derechos_reservados": "© 2026 CodigoSH.",
     "developed_with": "Entwickelt mit ❤️ unter Verwendung von Go und modernen Webtechnologien",
     "view_on_github": "Auf GitHub anzeigen",
-    "license_note": "Frei zur Nutzung, Änderung und Weitergabe."
+    "license_note": "© 2026 CodigoSH."
   },
   "languages": {
     "en": "English",

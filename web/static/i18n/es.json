@@ -176,16 +176,16 @@
     "feature5": "Drag & Drop para reordenar",
     "feature6": "Personalización avanzada",
     "developed": "Desarrollado con ❤️ usando Go y modern web technologies",
-    "copyright": "© 2026 CodigoSH. Todos los derechos reservados.",
+    "copyright": "© 2026 CodigoSH.",
     "viewOnGitHub": "Ver en GitHub",
     "titulo": "CodigoSH",
     "descripcion": "Una aplicación web moderna para gestionar tus marcadores y enlaces favoritos. Organiza, personaliza y accede rápidamente a tus recursos más importantes.",
     "caracteristicas_principales": "Características principales",
     "desarrollado_con": "Desarrollado con ❤️ usando Go y modern web technologies",
-    "derechos_reservados": "© 2026 CodigoSH. Todos los derechos reservados.",
+    "derechos_reservados": "© 2026 CodigoSH.",
     "developed_with": "Desarrollado con ❤️ usando Go y modern web technologies",
     "view_on_github": "Ver en GitHub",
-    "license_note": "Libre de usar, modificar y distribuir."
+    "license_note": "© 2026 CodigoSH."
   },
   "languages": {
     "en": "English",

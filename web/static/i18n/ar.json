@@ -98,10 +98,14 @@
     "cerrar_sesion": "تسجيل الخروج",
     "addSection": "إضافة قسم",
     "updateAvailable": "تحديث",
-    "updateTitle": "تحديث",    "currentVersion": "الإصدار الحالي:",    "newVersion": "إصدار جديد:",
+    "updateTitle": "تحديث",
+    "currentVersion": "الإصدار الحالي:",
+    "newVersion": "إصدار جديد:",
     "releaseDate": "تاريخ الإصدار:",
     "mainChanges": "التغييرات الرئيسية:",
-    "viewReleaseNotes": "عرض ملاحظات الإصدار",    "updateNow": "التحديث الآن",    "later": "لاحقا"
+    "viewReleaseNotes": "عرض ملاحظات الإصدار",
+    "updateNow": "التحديث الآن",
+    "later": "لاحقا"
   },
   "settings": {
     "title": "الإعدادات",
@@ -160,16 +164,16 @@
     "feature5": "السحب والإفلات لإعادة الترتيب",
     "feature6": "تخصيص متقدم",
     "developed": "تم التطوير بـ ❤️ باستخدام Go وتقنيات الويب الحديثة",
-    "copyright": "© 2026 CodigoSH. جميع الحقوق محفوظة.",
+    "copyright": "© 2026 CodigoSH.",
     "viewOnGitHub": "عرض على GitHub",
     "titulo": "CodigoSH",
     "descripcion": "تطبيق ويب حديث لإدارة الإشارات المرجعية والروابط المفضلة لديك. تنظيم وتخصيص والوصول السريع إلى أهم مواردك.",
     "caracteristicas_principales": "الميزات الرئيسية",
     "desarrollado_con": "تم تطويره بـ ❤️ باستخدام Go والتقنيات الحديثة",
-    "derechos_reservados": "© 2026 CodigoSH. جميع الحقوق محفوظة.",
+    "derechos_reservados": "© 2026 CodigoSH.",
     "developed_with": "تم تطويره بـ ❤️ باستخدام Go وتقنيات الويب الحديثة",
     "view_on_github": "عرض على GitHub",
-    "license_note": "حر في الاستخدام والتعديل والتوزيع."
+    "license_note": "© 2026 CodigoSH."
   },
   "languages": {
     "en": "English",

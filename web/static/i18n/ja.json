@@ -103,7 +103,9 @@
     "newVersion": "新しいバージョン：",
     "releaseDate": "リリース日：",
     "mainChanges": "主な変更：",
-    "viewReleaseNotes": "リリースノートを表示",    "updateNow": "今すぐ更新",    "later": "後で"
+    "viewReleaseNotes": "リリースノートを表示",
+    "updateNow": "今すぐ更新",
+    "later": "後で"
   },
   "settings": {
     "title": "設定",
@@ -162,16 +164,16 @@
     "feature5": "ドラッグ＆ドロップで並べ替え",
     "feature6": "高度なカスタマイズ",
     "developed": "Goとモダンなウェブ技術を使用して❤️で開発",
-    "copyright": "© 2026 CodigoSH。著作権所有。",
+    "copyright": "© 2026 CodigoSH.",
     "viewOnGitHub": "GitHubで表示",
     "titulo": "CodigoSH",
     "descripcion": "ブックマークとお気に入りのリンクを管理する最新のWebアプリケーション。最も重要なリソースを整理、カスタマイズ、すばやくアクセスします。",
     "caracteristicas_principales": "主な特徴",
     "desarrollado_con": "❤️を使用してGoと最新のWeb技術で開発",
-    "derechos_reservados": "©2026 CodigoSH。著作権所有。",
+    "derechos_reservados": "© 2026 CodigoSH.",
     "developed_with": "❤️ を使用して Go と最新の Web テクノロジーで開発",
     "view_on_github": "GitHub で見る",
-    "license_note": "自由に使用、改変、配布できます。"
+    "license_note": "© 2026 CodigoSH."
   },
   "languages": {
     "en": "English",

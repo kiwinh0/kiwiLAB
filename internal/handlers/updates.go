@@ -134,7 +134,7 @@ func compareVersions(v1, v2 string) int {
 // parseChanges extrae los cambios principales del body del release
 func parseChanges(body string) []string {
 	if body == "" {
-		return []string{"Nueva actualización disponible"}
+		return []string{"Varias mejoras internas"}
 	}
 
 	lines := strings.Split(body, "\n")
@@ -152,7 +152,7 @@ func parseChanges(body string) []string {
 	}
 
 	if len(changes) == 0 {
-		changes = []string{"Nueva actualización disponible"}
+		changes = []string{"Varias mejoras internas"}
 	}
 
 	return changes

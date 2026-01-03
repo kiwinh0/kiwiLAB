@@ -409,53 +409,35 @@
     </div>
 
     <script>
-        // Función COMPLETA para traducir TODOS los elementos de la página About
+        // Traduce elementos clave con data-i18n
         function translateAboutPage() {
-            const translations = {
-                'Una aplicación web moderna para gestionar tus marcadores y enlaces favoritos. Organiza, personaliza y accede rápidamente a tus recursos más importantes.': i18n.translate('about.description') || 'Una aplicación web moderna para gestionar tus marcadores y enlaces favoritos. Organiza, personaliza y accede rápidamente a tus recursos más importantes.',
-                'Desarrollado con ❤️ usando Go y modern web technologies': i18n.translate('about.developed_with') || 'Desarrollado con ❤️ usando Go y modern web technologies',
-                '© 2026 CodigoSH - Licencia MIT': i18n.translate('about.copyright') || '© 2026 CodigoSH - Licencia MIT',
-                'Libre de usar, modificar y distribuir.': i18n.translate('about.license_note') || 'Libre de usar, modificar y distribuir.',
-                'Ver en GitHub': i18n.translate('about.view_on_github') || 'Ver en GitHub'
+            const setText = (selector, key, fallback) => {
+                const el = document.querySelector(selector);
+                if (!el) return;
+                const translated = i18n.translate(key) || fallback;
+                el.textContent = translated;
             };
-            
-            // Traducir versión con número dinámico
+
+            // Versión dinámica
             const versionEl = document.querySelector('.version');
             if (versionEl) {
                 const versionNumber = versionEl.getAttribute('data-version');
                 const versionLabel = i18n.translate('about.version') || 'Versión';
                 versionEl.textContent = `${versionLabel} ${versionNumber}`;
             }
-            
-            // Traducir descripción
-            const descEl = document.querySelector('.description');
-            if (descEl && translations[descEl.textContent.trim()]) {
-                descEl.textContent = translations[descEl.textContent.trim()];
-            }
-            
-            // Traducir footer (desarrollado con...)
-            const footerPs = document.querySelectorAll('.footer p');
-            footerPs.forEach(p => {
-                const text = p.textContent.trim();
-                if (translations[text]) {
-                    p.textContent = translations[text];
-                }
-            });
-            
-            // Traducir link de GitHub
+
+            setText('.description', 'about.description', document.querySelector('.description')?.textContent.trim());
+            setText('.developed', 'about.developed_with', 'Desarrollado con ❤️ usando Go y modern web technologies');
+            setText('.copyright', 'about.copyright', '© 2026 CodigoSH. Todos los derechos reservados.');
+            setText('.license-note', 'about.license_note', 'Libre de usar, modificar y distribuir.');
+
             const githubLink = document.querySelector('.github-link');
             if (githubLink) {
-                const linkText = githubLink.textContent.trim();
-                if (translations[linkText]) {
-                    const trans = translations[linkText];
-                    // Preservar el SVG
-                    const svg = githubLink.querySelector('svg');
-                    githubLink.textContent = trans;
-                    if (svg) {
-                        githubLink.appendChild(svg);
-                        githubLink.insertBefore(document.createTextNode(trans), svg);
-                    }
-                }
+                const icon = githubLink.querySelector('svg');
+                const translated = i18n.translate('about.view_on_github') || 'Ver en GitHub';
+                githubLink.innerHTML = '';
+                if (icon) githubLink.appendChild(icon);
+                githubLink.appendChild(document.createTextNode(' ' + translated));
             }
         }
 
@@ -468,10 +450,24 @@
         // Inicializar i18n cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', function() {
             const userLanguage = document.documentElement.lang || 'es';
-            i18n.loadLanguage(userLanguage).then(() => {
-                translateAboutPage();
-                localStorage.setItem('currentLanguage', userLanguage);
-            });
+            if (window.i18n && window.i18n.loadLanguage) {
+                i18n.loadLanguage(userLanguage).then(() => {
+                    translateAboutPage();
+                    localStorage.setItem('currentLanguage', userLanguage);
+                }).catch(err => {
+                    console.warn('Error loading language:', err);
+                    translateAboutPage();
+                });
+            } else {
+                // i18n no disponible, intentar más tarde
+                setTimeout(() => {
+                    if (window.i18n && window.i18n.loadLanguage) {
+                        i18n.loadLanguage(userLanguage).then(() => {
+                            translateAboutPage();
+                        });
+                    }
+                }, 100);
+            }
         });
     </script>
 </body>

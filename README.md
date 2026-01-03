@@ -58,15 +58,6 @@ El asistente de instalación te guiará para crear tu usuario y configurar la ap
 
 ---
 
-## 🎯 Primer Uso
-
-1. Accede a http://IP_DEL_SERVIDOR:8080
-2. El asistente de setup te guiará paso a paso
-3. Selecciona idioma, crea tu usuario admin y configura preferencias
-4. ¡Comienza a agregar tus marcadores!
-
----
-
 ## ⚙️ Configuración
 
 Edita `~/.codigosh/config.yaml` si necesitas cambios avanzados:

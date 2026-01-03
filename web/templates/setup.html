@@ -974,13 +974,21 @@
                 document.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
                 savedOption.classList.add('selected');
             }
-            if (window.i18n) {
-                window.i18n.currentLanguage = initialLanguage;
-                window.i18n.loadLanguage(initialLanguage).then(() => {
-                    window.i18n.updatePageLanguage();
-                    updateProgress();
-                });
+            
+            // Esperar a que i18n esté disponible
+            function loadLanguageIfReady() {
+                if (window.i18n && window.i18n.loadLanguage) {
+                    window.i18n.currentLanguage = initialLanguage;
+                    window.i18n.loadLanguage(initialLanguage).then(() => {
+                        window.i18n.updatePageLanguage();
+                        updateProgress();
+                    });
+                } else {
+                    // Reintentar en 100ms
+                    setTimeout(loadLanguageIfReady, 100);
+                }
             }
+            loadLanguageIfReady();
             
             if (dropdownSelected && dropdownMenu) {
                 dropdownSelected.addEventListener('click', function(e) {
@@ -1028,7 +1036,7 @@
                         dropdownSelected.classList.remove('open');
                         
                         const i18nInstance = window.i18n || window.parent?.i18n || i18n;
-                        if (i18nInstance) {
+                        if (i18nInstance && i18nInstance.loadLanguage) {
                             // Update language for UI only (don't persist yet)
                             i18nInstance.currentLanguage = lang;
                             i18nInstance.loadLanguage(lang).then(() => {
@@ -1038,6 +1046,18 @@
                                 i18nInstance.updatePageLanguage();
                                 updateProgress();
                             });
+                        } else {
+                            // Si i18n no está listo, reintentar
+                            setTimeout(() => {
+                                const i18nRetry = window.i18n;
+                                if (i18nRetry && i18nRetry.loadLanguage) {
+                                    i18nRetry.currentLanguage = lang;
+                                    i18nRetry.loadLanguage(lang).then(() => {
+                                        i18nRetry.updatePageLanguage();
+                                        updateProgress();
+                                    });
+                                }
+                            }, 100);
                         }
                     });
                 });
